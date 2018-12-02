@@ -1,6 +1,6 @@
 ﻿namespace Vertx
 {
-    public interface IDocumentationPage : IDocumentation
+    internal interface IDocumentationPage : IDocumentation
     {
     }
 }

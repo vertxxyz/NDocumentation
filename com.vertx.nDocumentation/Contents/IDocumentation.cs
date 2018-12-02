@@ -2,7 +2,7 @@
 
 namespace Vertx
 {
-	public interface IDocumentation
+	internal interface IDocumentation
 	{
 		/// <summary>
 		/// Use this function to draw documentation content.

@@ -18,7 +18,6 @@ namespace Vertx
 		/// </summary>
 		public abstract float Order { get; }
 		
-		
 		public abstract void DrawDocumentation(VisualElement root);
 		public abstract void Initialise(DocumentationWindow window);
 	}
