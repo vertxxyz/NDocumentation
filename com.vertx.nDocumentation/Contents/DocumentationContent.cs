@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Experimental.UIElements;
+using UnityEngine.UIElements;
 using static Vertx.DocumentationPage;
+using static Vertx.NDocumentationUtility;
 
 namespace Vertx
 {
@@ -15,20 +15,35 @@ namespace Vertx
 		private string searchString = string.Empty;
 
 		//The default root is set as pages are added as to provide an easy way for content to be added without providing the root to functions constantly.
-		private static VisualElement currentDefaultRoot;
-		public void SetCurrentDefaultRoot(VisualElement root) => currentDefaultRoot = root;
-		public VisualElement GetRoot(VisualElement root) => root ?? currentDefaultRoot;
+		private static VisualElement _currentDefaultRoot;
+		public void SetCurrentDefaultRoot(VisualElement root) => _currentDefaultRoot = root;
+		public VisualElement GetRoot(VisualElement root) => root ?? _currentDefaultRoot;
+
+		/// <summary>
+		/// Adds a VisualElement to a root (default root if null is provided)
+		/// </summary>
+		/// <param name="element">Element to add to root</param>
+		/// <param name="root">Root to add to</param>
+		public void AddToRoot(VisualElement element, VisualElement root = null) => GetRoot(root).Add(element);
 
 		private DocumentationPageRoot pageRoot;
-		private Dictionary<string, IDocumentationPage> pages;
-		private Dictionary<IDocumentationPage, List<DocumentationPageAddition>> additions;
-		private Dictionary<IDocumentationPage, List<IDocumentationPage>> aboveButtonLinks;
-		private Dictionary<IDocumentationPage, List<IDocumentationPage>> belowButtonLinks;
+		private VisualElement windowRoot;
+		private VisualElement contentRoot;
+		private readonly DocumentationWindow window;
+		//Full Name to page
+		private readonly Dictionary<string, IDocumentationPage> pages = new Dictionary<string, IDocumentationPage>();
+		//Page to documentation additions associated with it
+		private readonly Dictionary<IDocumentationPage, List<DocumentationPageAddition>> additions = new Dictionary<IDocumentationPage, List<DocumentationPageAddition>>();
+		//Page to buttons injected into it.
+		private readonly Dictionary<IDocumentationPage, List<ButtonInjection>> aboveButtonLinks = new Dictionary<IDocumentationPage, List<ButtonInjection>>();
+		private readonly Dictionary<IDocumentationPage, List<ButtonInjection>> belowButtonLinks = new Dictionary<IDocumentationPage, List<ButtonInjection>>();
 
-		public DocumentationContent(VisualElement root, Type windowRootType, string stateEditorPrefsKey = null)
+
+		public DocumentationContent(VisualElement root, DocumentationWindow window, string stateEditorPrefsKey = null)
 		{
+			this.window = window;
 			this.stateEditorPrefsKey = stateEditorPrefsKey;
-			InitialisePages();
+			
 			IMGUIContainer browserBar = new IMGUIContainer(BrowserBar)
 			{
 				style =
@@ -37,6 +52,27 @@ namespace Vertx
 				}
 			};
 			root.Add(browserBar);
+			StyleSheet styleSheet = LoadAssetOfType<StyleSheet>("nDocumentationStyles", SearchFilter.Packages);
+			root.styleSheets.Add(styleSheet);
+			
+			ScrollView scrollView = new ScrollView
+			{
+				name = "Scroll View",
+				showHorizontal = false,
+				showVertical = true
+			};
+			scrollView.AddToClassList("scroll-view");
+			scrollView.contentContainer.AddToClassList("scroll-view-content");
+			contentRoot = scrollView.contentContainer;
+			root.Add(scrollView);
+			SetCurrentDefaultRoot(contentRoot);
+		}
+
+		public void InitialiseContent()
+		{
+			Type windowRootType = window.GetType();
+			InitialisePages();
+			Home();
 
 			void InitialisePages()
 			{
@@ -45,7 +81,6 @@ namespace Vertx
 				List<DocumentationPage> documentationPages = new List<DocumentationPage>();
 				List<DocumentationPageAddition> documentationAdditions = new List<DocumentationPageAddition>();
 				
-				pages = new Dictionary<string, IDocumentationPage>();
 				foreach (IDocumentation iDoc in documentation)
 				{
 					switch (iDoc)
@@ -70,6 +105,7 @@ namespace Vertx
 						default:
 							throw new NotImplementedException();
 					}
+					iDoc.Initialise(window);
 				}
 
 				if (pageRoot == null)
@@ -79,7 +115,6 @@ namespace Vertx
 				}
 
 				//fill the additions dictionary
-				additions = new Dictionary<IDocumentationPage, List<DocumentationPageAddition>>();
 				foreach (DocumentationPageAddition docAddition in documentationAdditions)
 				{
 					Type pageToAddToType = docAddition.PageToAddToType;
@@ -95,22 +130,23 @@ namespace Vertx
 
 
 				//Discover the injected buttons
-				var _aboveButtonLinksTemp = new Dictionary<IDocumentationPage, List<ButtonInjection>>();
-				var _belowButtonLinksTemp = new Dictionary<IDocumentationPage, List<ButtonInjection>>();
 				foreach (DocumentationPage iDoc in documentationPages)
 				{
 					ButtonInjection[] buttonLinkAbove = iDoc.InjectButtonLinkAbove;
 					if (buttonLinkAbove != null)
-						AddButtonInjections(buttonLinkAbove, "above", _aboveButtonLinksTemp);
+						AddButtonInjections(buttonLinkAbove, "above", aboveButtonLinks);
 					
 					ButtonInjection[] buttonLinkBelow = iDoc.InjectButtonLinkBelow;
 					if (buttonLinkBelow != null)
-						AddButtonInjections(buttonLinkBelow, "below", _belowButtonLinksTemp);
+						AddButtonInjections(buttonLinkBelow, "below", belowButtonLinks);
 
 					void AddButtonInjections(ButtonInjection[] injections, string location, Dictionary<IDocumentationPage, List<ButtonInjection>> dictionary)
 					{
+						//For all the buttons in we're injecting
 						foreach (ButtonInjection buttonInjection in injections)
 						{
+							buttonInjection.pageOfOrigin = iDoc;
+							//We find the relevant page and add our injected button to its dictionary entry
 							GetDocumentationPage<ButtonInjection>(buttonInjection.pageType,
 								"does not provide a page to add to.",
 								$"{iDoc.GetType().FullName}'s intended location for button injection ({location}) {buttonInjection.pageType.FullName}",
@@ -118,33 +154,18 @@ namespace Vertx
 						}
 					}
 				}
+				
 				//Sort the injected buttons
-				foreach (List<ButtonInjection> buttonInjections in _aboveButtonLinksTemp.Values)
+				foreach (List<ButtonInjection> buttonInjections in aboveButtonLinks.Values)
 					buttonInjections.Sort((a, b) => a.order.CompareTo(b.order));
-				foreach (List<ButtonInjection> buttonInjections in _belowButtonLinksTemp.Values)
+				foreach (List<ButtonInjection> buttonInjections in belowButtonLinks.Values)
 					buttonInjections.Sort((a, b) => a.order.CompareTo(b.order));
-				//Finalise the injected buttons
-				aboveButtonLinks = new Dictionary<IDocumentationPage, List<IDocumentationPage>>();
-				belowButtonLinks = new Dictionary<IDocumentationPage, List<IDocumentationPage>>();
-				FinaliseInjectedButtons(_aboveButtonLinksTemp, aboveButtonLinks);
-				FinaliseInjectedButtons(_belowButtonLinksTemp, belowButtonLinks);
-
-				void FinaliseInjectedButtons(Dictionary<IDocumentationPage, List<ButtonInjection>> _buttonLinksTemp, Dictionary<IDocumentationPage, List<IDocumentationPage>> buttonLinks)
-				{
-					foreach (var keyValuePair in _buttonLinksTemp)
-					{
-						List<IDocumentationPage> _pages = new List<IDocumentationPage>();
-						foreach (ButtonInjection buttonInjection in keyValuePair.Value)
-							_pages.Add(pages[buttonInjection.pageType.FullName]);
-						buttonLinks.Add(keyValuePair.Key, _pages);
-					}
-				}
 
 				void GetDocumentationPage<T>(Type query, string queryNullError, string queryNotIDocError, Dictionary<IDocumentationPage, List<T>> dictionary, T add)
 				{
 					if (query == null)
 					{
-						Debug.LogError($"{query.GetType().FullName} {queryNullError}");
+						Debug.LogError($"{query.FullName} {queryNullError}");
 						return;
 					}
 
@@ -167,35 +188,48 @@ namespace Vertx
 			}
 		}
 
-		#region Editor Extensions 
-
-		private static Type _editorAssembliesType;
-		private static Type editorAssembliesType => _editorAssembliesType ?? (_editorAssembliesType = Type.GetType("UnityEditor.EditorAssemblies,UnityEditor"));
-
-		/// <summary>
-		/// Returns an array of Types inherited from Type T in the Loaded (user & Unity) Assemblies.
-		/// This function also operates with interfaces.
-		/// </summary>
-		private static IEnumerable<Type> GetTypesOfExtensions<T>() => (IEnumerable<Type>) SubclassesOf_Method.Invoke(null, new object[] {typeof(T)});
-
-		private static MethodInfo _SubclassesOf_Method;
-		private static MethodInfo SubclassesOf_Method => _SubclassesOf_Method ?? (_SubclassesOf_Method = editorAssembliesType.GetMethod("SubclassesOf", BindingFlags.Static | BindingFlags.NonPublic));
-
-		private static IEnumerable<T> GetExtensionsOfTypeIE<T>()
+		private void LoadPage(string pageFullName)
 		{
-			IEnumerable<Type> typesOfEditorExtensions = GetTypesOfExtensions<T>();
-			List<T> extensions = new List<T>();
-			foreach (Type t in typesOfEditorExtensions)
+			
+			if (!pages.TryGetValue(pageFullName, out IDocumentationPage page))
 			{
-				if(t.IsAbstract)
-					continue;
-				extensions.Add((T) Activator.CreateInstance(t));
+				Debug.LogError($"Window does not contain a reference to {pageFullName}.");
+				return;
 			}
 
-			return extensions;
-		}
+			
+			VisualElement root = GetRoot(null);
+			root.Clear();
 
-		#endregion
+			//Above buttons
+			if (aboveButtonLinks.TryGetValue(page, out var buttonsAbove))
+				AddInjectedButtons(buttonsAbove);
+			
+			//Documentation
+			page.DrawDocumentation(root);
+			
+			//Additions
+			if (additions.TryGetValue(page, out var additionsList))
+			{
+				foreach (var addition in additionsList)
+					addition.DrawDocumentation(root);
+			}
+
+			//Below buttons
+			if (belowButtonLinks.TryGetValue(page, out var buttonsBelow))
+				AddInjectedButtons(buttonsBelow);
+
+			currentPageStateName = pageFullName;
+
+			void AddInjectedButtons(List<ButtonInjection> buttons)
+			{
+				foreach (ButtonInjection button in buttons)
+				{
+					DocumentationPage pageOfOrigin = button.pageOfOrigin;
+					window.CreateHeaderButton(pageOfOrigin.Title, pageOfOrigin.Color, () => GoToPage(pageOfOrigin.GetType().FullName));
+				}
+			}
+		}
 
 		void BrowserBar()
 		{
@@ -265,7 +299,7 @@ namespace Vertx
 
 		#region Navigation
 
-		void Home() => GoToPage(pageRoot.GetType().FullName);
+		public void Home() => GoToPage(pageRoot.GetType().FullName);
 
 
 		/// <summary>
@@ -275,6 +309,9 @@ namespace Vertx
 		/// <param name="dontAddToHistory">Whether to append a history item to the stack</param>
 		public void GoToPage(string pageName, bool dontAddToHistory = false)
 		{
+			if(!dontAddToHistory)
+				history.Push(currentPageStateName);
+			LoadPage(pageName);
 		}
 
 		#endregion

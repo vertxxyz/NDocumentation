@@ -1,14 +1,11 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.Experimental.UIElements;
+using UnityEngine.UIElements;
 
 namespace Vertx
 {
 	public abstract class DocumentationPage : IDocumentationPage
 	{
-		public abstract Color Color { get; }
-		public abstract string Title { get; }
-
 		#region Button Links
 		/// <summary>
 		/// Page link Button to be injected above a DocumentationPage's content
@@ -18,15 +15,19 @@ namespace Vertx
 		/// Page link Button to be injected below a DocumentationPage's content
 		/// </summary>
 		public abstract ButtonInjection[] InjectButtonLinkBelow { get; }
-		
+
 		/// <summary>
 		/// A description of a button to be injected above or below a DocumentationPage's content.
 		/// </summary>
-		public struct ButtonInjection
+		public class ButtonInjection
 		{
-			//Type name nameof(DocumentationPage) that should contain this page's link
+			/// <summary>
+			/// Type name nameof(DocumentationPage) that should contain this page's link
+			/// </summary>
 			public readonly Type pageType;
-			//The order this link is injected (lower is higher)
+			/// <summary>
+			/// The order this link is injected (lower is higher)
+			/// </summary>
 			public readonly float order;
 
 			public ButtonInjection(Type pageType, float order)
@@ -34,10 +35,17 @@ namespace Vertx
 				this.pageType = pageType;
 				this.order = order;
 			}
+
+			/// <summary>
+			/// Assigned internally.
+			/// </summary>
+			public DocumentationPage pageOfOrigin;
 		}
 		#endregion
-		
+		public abstract Color Color { get; }
+		public abstract string Title { get; }
+
 		public abstract void DrawDocumentation(VisualElement root);
-		public abstract void Initialise(DocumentationWindow window);
+		public virtual void Initialise(DocumentationWindow window) { }
 	}
 }

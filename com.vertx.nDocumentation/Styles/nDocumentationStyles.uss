@@ -1,0 +1,51 @@
+.scroll-view {
+	flex : 1;
+}
+
+.scroll-view-content {
+	flex-wrap: wrap;
+	align-items: flex-start;
+	flex-direction: column;
+	background-color: #383838;
+}
+
+.injected-button-wrapper {
+
+}
+
+.content-wrapper {
+	margin-left : 2px;
+	margin-right : 2px;
+	flex-wrap : wrap;
+	align-self : stretch;
+	align-items : stretch;
+	flex-direction : column;
+}
+
+.content-addition-wrapper {
+
+}
+
+.injected-button {
+	-unity-font-style : bold;
+	-unity-text-align : middle-left;
+	background-image : none;
+	background-color : #282828;
+	height : 20;
+	align-self : stretch;
+	padding: 1px 5px 1px 12px;
+	margin: 0px 0px 0px 0px;
+	border-left-width: 1px;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	cursor: link;
+}
+
+.injected-button:hover {
+	border-color: #AAAAAA;
+	border-left-width: 1px;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+}

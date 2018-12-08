@@ -1,5 +1,6 @@
 ﻿using System;
-using UnityEngine.Experimental.UIElements;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Vertx
 {
@@ -7,6 +8,8 @@ namespace Vertx
     {
         public abstract Type ParentDocumentationWindowType { get; }
         public abstract void DrawDocumentation(VisualElement root);
-        public abstract void Initialise(DocumentationWindow window);
+        public virtual void Initialise(DocumentationWindow window) { }
+        public virtual Color Color => Color.grey;
+        public virtual string Title => "Home";
     }
 }

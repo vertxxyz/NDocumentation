@@ -1,5 +1,5 @@
 ﻿using System;
-using UnityEngine.Experimental.UIElements;
+using UnityEngine.UIElements;
 
 namespace Vertx.Example
 {
@@ -8,11 +8,6 @@ namespace Vertx.Example
 		public override Type ParentDocumentationWindowType => typeof(ExampleWindow);
 
 		public override void DrawDocumentation(VisualElement root)
-		{
-			
-		}
-
-		public override void Initialise(DocumentationWindow window)
 		{
 			
 		}

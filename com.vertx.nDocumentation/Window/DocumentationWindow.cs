@@ -1,6 +1,7 @@
-﻿using UnityEditor;
-using UnityEditor.Experimental.UIElements;
-using UnityEngine.Experimental.UIElements;
+﻿using System;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Vertx
 {
@@ -16,10 +17,22 @@ namespace Vertx
 		
 		private void OnEnable()
 		{
-			VisualElement root = this.GetRootVisualContainer();
-			content = new DocumentationContent(root, GetType(), StateEditorPrefsKey());
+			content = new DocumentationContent(rootVisualElement, this, StateEditorPrefsKey());
+			content.InitialiseContent();
 		}
-		
-		
+
+		public void CreateHeaderButton(string text, Color textColor, Action action, VisualElement root = null)
+		{
+			Button headerButton = new Button(action)
+			{
+				text = text,
+				style =
+				{
+					color = textColor
+				}
+			};
+			headerButton.AddToClassList("injected-button");
+			content.AddToRoot(headerButton, root);
+		}
 	}
 }
