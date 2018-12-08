@@ -3,6 +3,7 @@ A documentation window for Unity Editor that displays rich text pages.
 
 ## Usage
 
+----
 ### Pages
 
 #### DocumentationWindow
@@ -21,6 +22,7 @@ The buttons are sorted by the Order field, with lower values being displayed abo
 - Extend *DocumentationPageAdditition* to add content to DocumentationPages (either *DocumentationPage*s or the *DocumentationPageRoot*.)
 - Additional content is sorted by the Order field, with lower values being displayed above others.
 
+----
 ### Content
 
 #### TODO

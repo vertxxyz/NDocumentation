@@ -1,6 +1,7 @@
 ﻿using UnityEditor;
+using UnityEngine;
 
-namespace Vertx
+namespace Vertx.Example
 {
 	public class ExampleWindow : DocumentationWindow
 	{
@@ -8,6 +9,7 @@ namespace Vertx
 		static void Open()
 		{
 			ExampleWindow exampleWindow = GetWindow<ExampleWindow>();
+			exampleWindow.titleContent = new GUIContent("Example");
 			exampleWindow.Show();
 		}
 

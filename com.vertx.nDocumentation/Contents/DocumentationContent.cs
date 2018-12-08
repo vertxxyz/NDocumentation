@@ -41,7 +41,7 @@ namespace Vertx
 			void InitialisePages()
 			{
 				//Find all the documentation and additions to it
-				List<IDocumentation> documentation = new List<IDocumentation>(GetExtensionsOfTypeIE<DocumentationPage>());
+				IEnumerable<IDocumentation> documentation = GetExtensionsOfTypeIE<IDocumentation>();
 				List<DocumentationPage> documentationPages = new List<DocumentationPage>();
 				List<DocumentationPageAddition> documentationAdditions = new List<DocumentationPageAddition>();
 				
@@ -60,9 +60,22 @@ namespace Vertx
 						case DocumentationPageRoot pageRoot:
 							pages.Add(pageRoot.GetType().FullName, pageRoot);
 							if (pageRoot.ParentDocumentationWindowType != windowRootType) continue;
+							if (this.pageRoot != null)
+							{
+								Debug.LogError($"Multiple pages are assigned to be the root for window. {this.pageRoot} & {pageRoot}.");
+								continue;
+							}
 							this.pageRoot = pageRoot;
 							break;
+						default:
+							throw new NotImplementedException();
 					}
+				}
+
+				if (pageRoot == null)
+				{
+					Debug.LogError("No root page defined.");
+					return;
 				}
 
 				//fill the additions dictionary
@@ -76,6 +89,9 @@ namespace Vertx
 						additions,
 						docAddition);
 				}
+
+				foreach (var additionList in additions.Values)
+					additionList.Sort((a,b)=>a.Order.CompareTo(b.Order));
 
 
 				//Discover the injected buttons
@@ -170,7 +186,12 @@ namespace Vertx
 			IEnumerable<Type> typesOfEditorExtensions = GetTypesOfExtensions<T>();
 			List<T> extensions = new List<T>();
 			foreach (Type t in typesOfEditorExtensions)
+			{
+				if(t.IsAbstract)
+					continue;
 				extensions.Add((T) Activator.CreateInstance(t));
+			}
+
 			return extensions;
 		}
 

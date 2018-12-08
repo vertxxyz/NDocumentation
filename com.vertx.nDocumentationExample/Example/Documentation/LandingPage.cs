@@ -1,14 +1,12 @@
-﻿using UnityEngine;
+﻿using System;
 using UnityEngine.Experimental.UIElements;
 
-namespace Vertx
+namespace Vertx.Example
 {
-	public class LandingPage : DocumentationPage
+	public class LandingPage : DocumentationPageRoot
 	{
-		public override Color Color => Color.clear;
-		public override string Title => string.Empty;
-		public override ButtonInjection[] InjectButtonLinkAbove => null;
-		public override ButtonInjection[] InjectButtonLinkBelow => null;
+		public override Type ParentDocumentationWindowType => typeof(ExampleWindow);
+
 		public override void DrawDocumentation(VisualElement root)
 		{
 			
