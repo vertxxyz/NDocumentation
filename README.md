@@ -8,6 +8,7 @@ A documentation window for Unity Editor that displays rich text pages.
 
 #### DocumentationWindow
 - Extend *DocumentationWindow* to provide a base window to inject documentation pages into.
+- Override DrawConstantHeader to provide a header to every page.
 
 #### DocumentationPageRoot
 - Extend *DocumentationPageRoot* to define a root page to a *DocumentationWindow*, a root page does not get linked to other than through **Home** links.
@@ -21,6 +22,7 @@ The buttons are sorted by the Order field, with lower values being displayed abo
 #### DocumentationPageAddition
 - Extend *DocumentationPageAdditition* to add content to DocumentationPages (either *DocumentationPage*s or the *DocumentationPageRoot*.)
 - Additional content is sorted by the Order field, with lower values being displayed above others.
+- Color and Title can be overriden to style these Button Links.
 
 ----
 ### Content

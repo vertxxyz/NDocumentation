@@ -29,11 +29,15 @@ namespace Vertx
 		private DocumentationPageRoot pageRoot;
 		private VisualElement windowRoot;
 		private VisualElement contentRoot;
+
 		private readonly DocumentationWindow window;
+
 		//Full Name to page
 		private readonly Dictionary<string, IDocumentationPage> pages = new Dictionary<string, IDocumentationPage>();
+
 		//Page to documentation additions associated with it
 		private readonly Dictionary<IDocumentationPage, List<DocumentationPageAddition>> additions = new Dictionary<IDocumentationPage, List<DocumentationPageAddition>>();
+
 		//Page to buttons injected into it.
 		private readonly Dictionary<IDocumentationPage, List<ButtonInjection>> aboveButtonLinks = new Dictionary<IDocumentationPage, List<ButtonInjection>>();
 		private readonly Dictionary<IDocumentationPage, List<ButtonInjection>> belowButtonLinks = new Dictionary<IDocumentationPage, List<ButtonInjection>>();
@@ -43,7 +47,7 @@ namespace Vertx
 		{
 			this.window = window;
 			this.stateEditorPrefsKey = stateEditorPrefsKey;
-			
+
 			IMGUIContainer browserBar = new IMGUIContainer(BrowserBar)
 			{
 				style =
@@ -54,7 +58,7 @@ namespace Vertx
 			root.Add(browserBar);
 			StyleSheet styleSheet = LoadAssetOfType<StyleSheet>("nDocumentationStyles", SearchFilter.Packages);
 			root.styleSheets.Add(styleSheet);
-			
+
 			ScrollView scrollView = new ScrollView
 			{
 				name = "Scroll View",
@@ -72,7 +76,16 @@ namespace Vertx
 		{
 			Type windowRootType = window.GetType();
 			InitialisePages();
-			Home();
+			if (EditorPrefs.HasKey(stateEditorPrefsKey))
+			{
+				string page = EditorPrefs.GetString(stateEditorPrefsKey);
+				if (!LoadPage(page))
+					Home();
+			}
+			else
+			{
+				Home();
+			}
 
 			void InitialisePages()
 			{
@@ -80,7 +93,7 @@ namespace Vertx
 				IEnumerable<IDocumentation> documentation = GetExtensionsOfTypeIE<IDocumentation>();
 				List<DocumentationPage> documentationPages = new List<DocumentationPage>();
 				List<DocumentationPageAddition> documentationAdditions = new List<DocumentationPageAddition>();
-				
+
 				foreach (IDocumentation iDoc in documentation)
 				{
 					switch (iDoc)
@@ -100,11 +113,13 @@ namespace Vertx
 								Debug.LogError($"Multiple pages are assigned to be the root for window. {this.pageRoot} & {pageRoot}.");
 								continue;
 							}
+
 							this.pageRoot = pageRoot;
 							break;
 						default:
 							throw new NotImplementedException();
 					}
+
 					iDoc.Initialise(window);
 				}
 
@@ -126,7 +141,7 @@ namespace Vertx
 				}
 
 				foreach (var additionList in additions.Values)
-					additionList.Sort((a,b)=>a.Order.CompareTo(b.Order));
+					additionList.Sort((a, b) => a.Order.CompareTo(b.Order));
 
 
 				//Discover the injected buttons
@@ -135,7 +150,7 @@ namespace Vertx
 					ButtonInjection[] buttonLinkAbove = iDoc.InjectButtonLinkAbove;
 					if (buttonLinkAbove != null)
 						AddButtonInjections(buttonLinkAbove, "above", aboveButtonLinks);
-					
+
 					ButtonInjection[] buttonLinkBelow = iDoc.InjectButtonLinkBelow;
 					if (buttonLinkBelow != null)
 						AddButtonInjections(buttonLinkBelow, "below", belowButtonLinks);
@@ -154,7 +169,7 @@ namespace Vertx
 						}
 					}
 				}
-				
+
 				//Sort the injected buttons
 				foreach (List<ButtonInjection> buttonInjections in aboveButtonLinks.Values)
 					buttonInjections.Sort((a, b) => a.order.CompareTo(b.order));
@@ -188,16 +203,15 @@ namespace Vertx
 			}
 		}
 
-		private void LoadPage(string pageFullName)
+		private bool LoadPage(string pageFullName)
 		{
-			
 			if (!pages.TryGetValue(pageFullName, out IDocumentationPage page))
 			{
 				Debug.LogError($"Window does not contain a reference to {pageFullName}.");
-				return;
+				return false;
 			}
 
-			
+
 			VisualElement root = GetRoot(null);
 			root.Clear();
 
@@ -207,10 +221,10 @@ namespace Vertx
 			//Above buttons
 			if (aboveButtonLinks.TryGetValue(page, out var buttonsAbove))
 				AddInjectedButtons(buttonsAbove);
-			
+
 			//Documentation
 			page.DrawDocumentation(window, root);
-			
+
 			//Additions
 			if (additions.TryGetValue(page, out var additionsList))
 			{
@@ -232,6 +246,8 @@ namespace Vertx
 					window.AddHeaderButton(pageOfOrigin.Title, pageOfOrigin.Color, () => GoToPage(pageOfOrigin.GetType().FullName));
 				}
 			}
+
+			return true;
 		}
 
 		void BrowserBar()
@@ -277,7 +293,18 @@ namespace Vertx
 		#region History
 
 		private readonly Stack<string> history = new Stack<string>();
-		private string currentPageStateName;
+		private string _currentPageStateName;
+
+		private string currentPageStateName
+		{
+			get => _currentPageStateName;
+			set
+			{
+				_currentPageStateName = value;
+				EditorPrefs.SetString(stateEditorPrefsKey, _currentPageStateName);
+			}
+		}
+
 		private readonly Stack<string> forwardHistory = new Stack<string>();
 
 		void Back()
@@ -312,7 +339,7 @@ namespace Vertx
 		/// <param name="addToHistory">Whether to append a history item to the stack</param>
 		public void GoToPage(string pageName, bool addToHistory = true)
 		{
-			if(addToHistory)
+			if (addToHistory)
 				history.Push(currentPageStateName);
 			LoadPage(pageName);
 		}

@@ -13,6 +13,6 @@ namespace Vertx.Example
 			exampleWindow.Show();
 		}
 
-		protected override string StateEditorPrefsKey() => "Example_Prefs_Key";
+		protected override string StateEditorPrefsKey => "Example_Prefs_Key";
 	}
 }
