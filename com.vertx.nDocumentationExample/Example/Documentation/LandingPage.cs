@@ -7,9 +7,10 @@ namespace Vertx.Example
 	{
 		public override Type ParentDocumentationWindowType => typeof(ExampleWindow);
 
-		public override void DrawDocumentation(VisualElement root)
+		public override void DrawDocumentation(DocumentationWindow window, VisualElement root)
 		{
-			
+			window.AddHeader("nDocumentation");
+			window.AddPlainText("NDocumentation provides an extensible Unity documentation solution with inline buttons and styling.");
 		}
 	}
 }

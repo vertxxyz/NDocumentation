@@ -9,9 +9,9 @@ namespace Vertx.Example
         public override ButtonInjection[] InjectButtonLinkBelow => new []{new ButtonInjection(typeof(LandingPage), 0)};
         public override Color Color => new Color(1f, 0.11f, 0.33f);
         public override string Title => "Creating Pages";
-        public override void DrawDocumentation(VisualElement root)
+        public override void DrawDocumentation(DocumentationWindow window, VisualElement root)
         {
-            
+            window.AddHeader("Creating Pages", 18, FontStyle.Normal);
         }
     }
 }

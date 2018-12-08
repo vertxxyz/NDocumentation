@@ -201,18 +201,21 @@ namespace Vertx
 			VisualElement root = GetRoot(null);
 			root.Clear();
 
+			//Constant header
+			window.DrawConstantHeader(root);
+
 			//Above buttons
 			if (aboveButtonLinks.TryGetValue(page, out var buttonsAbove))
 				AddInjectedButtons(buttonsAbove);
 			
 			//Documentation
-			page.DrawDocumentation(root);
+			page.DrawDocumentation(window, root);
 			
 			//Additions
 			if (additions.TryGetValue(page, out var additionsList))
 			{
 				foreach (var addition in additionsList)
-					addition.DrawDocumentation(root);
+					addition.DrawDocumentation(window, root);
 			}
 
 			//Below buttons
@@ -226,7 +229,7 @@ namespace Vertx
 				foreach (ButtonInjection button in buttons)
 				{
 					DocumentationPage pageOfOrigin = button.pageOfOrigin;
-					window.CreateHeaderButton(pageOfOrigin.Title, pageOfOrigin.Color, () => GoToPage(pageOfOrigin.GetType().FullName));
+					window.AddHeaderButton(pageOfOrigin.Title, pageOfOrigin.Color, () => GoToPage(pageOfOrigin.GetType().FullName));
 				}
 			}
 		}
@@ -283,7 +286,7 @@ namespace Vertx
 				return;
 			string backState = history.Pop();
 			forwardHistory.Push(currentPageStateName);
-			GoToPage(backState, true);
+			GoToPage(backState, false);
 		}
 
 		void Forward()
@@ -292,7 +295,7 @@ namespace Vertx
 				return;
 			string forwardState = forwardHistory.Pop();
 			history.Push(currentPageStateName);
-			GoToPage(forwardState, true);
+			GoToPage(forwardState, false);
 		}
 
 		#endregion
@@ -306,10 +309,10 @@ namespace Vertx
 		/// Displays the provided DocumentationPage.
 		/// </summary>
 		/// <param name="pageName">Page key</param>
-		/// <param name="dontAddToHistory">Whether to append a history item to the stack</param>
-		public void GoToPage(string pageName, bool dontAddToHistory = false)
+		/// <param name="addToHistory">Whether to append a history item to the stack</param>
+		public void GoToPage(string pageName, bool addToHistory = true)
 		{
-			if(!dontAddToHistory)
+			if(addToHistory)
 				history.Push(currentPageStateName);
 			LoadPage(pageName);
 		}

@@ -28,7 +28,7 @@
 
 .injected-button {
 	-unity-font-style : bold;
-	-unity-text-align : middle-left;
+	-unity-text-align : upper-left;
 	background-image : none;
 	background-color : #282828;
 	height : 20;
@@ -43,9 +43,41 @@
 }
 
 .injected-button:hover {
-	border-color: #AAAAAA;
+	border-color: #666666;
 	border-left-width: 1px;
 	border-top-width: 1px;
 	border-right-width: 1px;
 	border-bottom-width: 1px;
+}
+
+.plain-text {
+	color: #B5B5B5;
+	padding: 0px 0px 0px 0px;
+	margin-left: 16px;
+	margin-right: 5px;
+	-unity-word-wrap: true;
+	white-space: normal;
+}
+
+.plain-text.header {
+	font-size: 24px;
+	-unity-font-style : bold;
+}
+
+.splitter {
+	align-self: stretch;
+	margin-bottom : 4px;
+	margin-left : 16px;
+	margin-right : 4px;
+	margin-top : 0px;
+	height : 1px;
+	background-color : #999999;
+}
+
+.splitter.half {
+	width : 200px;
+}
+
+.splitter.inverse {
+	background-color : #1E1E1E;
 }
