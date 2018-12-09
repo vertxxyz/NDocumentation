@@ -163,13 +163,15 @@ namespace Vertx
 							continue;
 						if (!int.TryParse(stringVariables, out int size))
 						{
-							Debug.Log($"Size tag \"{resultantTag}\" does not contain a parseable integer.");
+							Debug.Log($"Size tag \"{resultantTag}\" does not contain a parseable integer. \"{stringVariables}\"");
 							RichTextDebugHighlit(indexOfOpening, indexOfClosing);
-							continue;
 						}
-						AddLastTextWithRichTextTag(currentRichTextTag);
-						currentRichTextTag = currentRichTextTag.GetWithNewSize(size);
-						AddTag();
+						else
+						{
+							AddLastTextWithRichTextTag(currentRichTextTag);
+							currentRichTextTag = currentRichTextTag.GetWithNewSize(size);
+							AddTag();
+						}
 					}
 
 					bool GetStringVariables(string tag, out string stringVariables)
@@ -183,7 +185,7 @@ namespace Vertx
 							return false;
 						}
 
-						stringVariables = resultantTag.Substring(indexOfEquals).Replace(" ", string.Empty);
+						stringVariables = resultantTag.Substring(indexOfEquals + 1).Replace(" ", string.Empty);
 						return true;
 					}
 				}
@@ -197,7 +199,6 @@ namespace Vertx
 				}
 				void AddTag () => previousRichTextTags.Push(currentRichTextTag);
 				void ClearTags() => previousRichTextTags.Clear();
-
 				void AddLastTextWithRichTextTag (RichTextTag tag)
 				{
 					//Don't add if no text content to add.

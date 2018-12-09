@@ -146,13 +146,13 @@ namespace Vertx
 
 					//Add all the words and style them.
 					//TODO ----------------------------------------------------------------------------------
-
-
 					void AddRichText(RichText richText)
 					{
 						Label inlineText = AddInlineText(richText.associatedText);
 						RichTextTag tag = richText.richTextTag;
 						inlineText.style.unityFontStyleAndWeight = tag.fontStyle;
+						if (tag.size > 0)
+							inlineText.style.fontSize = tag.size;
 						if(tag.color != Color.clear)
 							inlineText.style.color = tag.color;
 						results.Add(inlineText);

@@ -40,6 +40,7 @@
 	align-self : stretch;
 	align-items : stretch;
 	flex-direction : row;
+	-unity-text-align: lower-left;
 }
 
 /* BUTTONS */

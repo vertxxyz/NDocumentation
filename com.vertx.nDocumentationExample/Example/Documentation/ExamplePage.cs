@@ -12,7 +12,7 @@ namespace Vertx.Example
         public override void DrawDocumentation(DocumentationWindow window, VisualElement root)
         {
             window.AddHeader("Creating Pages", 18, FontStyle.Normal);
-            window.AddRichText("<b>Bold text</b>. <i>italics text</>. <b><i>bold italics</b>.</i>");
+            window.AddRichText("<b>Bold text</b>. <i>italics text</>. <b><i>bold italics</b>.</i> <size=20>Large Text</>");
         }
     }
 }
