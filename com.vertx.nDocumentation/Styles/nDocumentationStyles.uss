@@ -32,7 +32,11 @@
 
 .paragraph-container {
 	padding: 0px 0px 0px 0px;
-	margin: 0px 0px 0px 0px;
+	margin: 2px 5px 5px 16px;
+	flex-wrap: wrap;
+	align-self : stretch;
+	align-items : stretch;
+	flex-direction : row;
 }
 
 /* BUTTONS */
@@ -66,10 +70,21 @@
 .plain-text {
 	color: #B5B5B5;
 	padding: 0px 0px 0px 0px;
-	margin-left: 16px;
-	margin-right: 5px;
+	margin: 2px, 5px, 5px, 16px;
 	-unity-word-wrap: true;
 	white-space: normal;
+}
+
+.inline-text {
+	color: #B5B5B5;
+	padding: 0px 0px 0px 0px;
+	margin: 0px 0px 0px 0px;
+}
+
+.inline-text-group {
+	padding: 0px 0px 0px 0px;
+	margin: 0px 0px 0px 0px;
+	flex-direction : row;
 }
 
 .plain-text.header {

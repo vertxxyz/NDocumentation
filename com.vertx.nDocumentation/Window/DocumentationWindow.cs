@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -79,6 +80,17 @@ namespace Vertx
 			content.AddToRoot(plainText, root);
 			return plainText;
 		}
+		
+		public Label AddInlineText(string text, VisualElement root = null)
+		{
+			Label inlineText = new Label
+			{
+				text = text
+			};
+			inlineText.AddToClassList("inline-text");
+			content.AddToRoot(inlineText, root);
+			return inlineText;
+		}
 
 		public List<VisualElement> AddRichText(string text, VisualElement root = null)
 		{
@@ -89,28 +101,63 @@ namespace Vertx
 			foreach (RichText richText in richTexts)
 			{
 				string[] strings = richText.associatedText.Split('\n');
-				if (strings.Length == 1)
+				for (int i = 0; i < strings.Length; i++)
 				{
-					paragraphs[paragraphs.Count-1].Add(richText);
-				}
-				else
-				{
-					for (int i = 0; i < strings.Length; i++)
+					if (i != 0)
+						paragraphs.Add(new List<RichText>());
+					//Split paragraph content (already split by tag) into individual words 
+					string[] wordSplit = Regex.Split(strings[i], @"(?<=[ -])"); //Split but keep delimiters attached.
+					foreach (var word in wordSplit)
 					{
-						string s = strings[i];
-						if (i != 0)
-							paragraphs.Add(new List<RichText>());
-						paragraphs[paragraphs.Count-1].Add(new RichText(richText.richTextTag, s));
+						if(!string.IsNullOrEmpty(word))
+							paragraphs[paragraphs.Count - 1].Add(new RichText(richText.richTextTag, word));
 					}
 				}
 			}
+			
 			foreach (List<RichText> paragraph in paragraphs)
 			{
+				//Add all the paragraphs
 				content.SetCurrentDefaultRoot(AddParagraphContainer(root));
-				foreach (RichText richText in paragraph)
+				for (int i = 0; i < paragraph.Count; i++)
 				{
-					//TODO switch
-					results.Add(AddPlainText(richText.associatedText));
+					RichText word = paragraph[i];
+
+					if (i < paragraph.Count - 1)
+					{
+						//If there are more words 
+						RichText nextWord = paragraph[i + 1];
+						string nextText = nextWord.associatedText;
+						if (Regex.IsMatch(nextText, "^[^a-zA-Z] ?"))
+						{
+							VisualElement lastRoot = content.GetRoot(null);
+							VisualElement inlineGroup = new VisualElement();
+							content.AddToRoot(inlineGroup, lastRoot);
+							inlineGroup.AddToClassList("inline-text-group");
+							content.SetCurrentDefaultRoot(inlineGroup);
+							AddRichText(word);
+							AddRichText(nextWord);
+							content.SetCurrentDefaultRoot(lastRoot);
+							++i;
+							continue;
+						}
+					}
+					AddRichText(word);
+
+					//Add all the words and style them.
+					//TODO ----------------------------------------------------------------------------------
+
+
+					void AddRichText(RichText richText)
+					{
+						Label inlineText = AddInlineText(richText.associatedText);
+						RichTextTag tag = richText.richTextTag;
+						inlineText.style.unityFontStyleAndWeight = tag.fontStyle;
+						if(tag.color != Color.clear)
+							inlineText.style.color = tag.color;
+						results.Add(inlineText);
+					}
+					//TODO ----------------------------------------------------------------------------------
 				}
 			}
 

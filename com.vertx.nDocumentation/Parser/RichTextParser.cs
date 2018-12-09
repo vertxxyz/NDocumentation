@@ -25,6 +25,7 @@ namespace Vertx
 			List<RichText> resultantRichText = new List<RichText>();
 			
 			RichTextTag currentRichTextTag = new RichTextTag();
+			Stack<RichTextTag> previousRichTextTags = new Stack<RichTextTag>();
 			int currentIndex = 0;
 			int length = richText.Length;
 			int lastNewTag = 0;
@@ -108,21 +109,29 @@ namespace Vertx
 					//Switch through tags that are entire strings
 					switch (resultantTag)
 					{
+						case "/":
+							AddLastTextWithRichTextTag(currentRichTextTag);
+							RemoveTag(true);
+							break;
 						case "b":
 							AddLastTextWithRichTextTag(currentRichTextTag);
 							currentRichTextTag = currentRichTextTag.GetWithAddedBold();
+							AddTag();
 							break;
 						case "/b":
 							AddLastTextWithRichTextTag(currentRichTextTag);
 							currentRichTextTag = currentRichTextTag.GetWithRemovedBold();
+							RemoveTag();
 							break;
 						case "i":
 							AddLastTextWithRichTextTag(currentRichTextTag);
 							currentRichTextTag = currentRichTextTag.GetWithAddedItalics();
+							AddTag();
 							break;
 						case "/i":
 							AddLastTextWithRichTextTag(currentRichTextTag);
 							currentRichTextTag = currentRichTextTag.GetWithRemovedItalics();
+							RemoveTag();
 							break;
 						case "code":
 							if (!currentRichTextTag.isDefault)
@@ -133,7 +142,8 @@ namespace Vertx
 								return resultantRichText;
 							}
 							AddLastTextWithRichTextTag(currentRichTextTag);
-							currentRichTextTag = new RichTextTag(Tag.code, FontStyle.Normal, Color.white, 0, null);
+							currentRichTextTag = new RichTextTag(Tag.code, FontStyle.Normal, Color.clear, 0, null);
+							ClearTags();
 							break;
 						case "/code":
 							if (currentRichTextTag.tag != Tag.code)
@@ -147,7 +157,17 @@ namespace Vertx
 							break;
 					}
 				}
-				
+
+				void RemoveTag (bool assignTag = false)
+				{
+					if(assignTag)
+						currentRichTextTag = previousRichTextTags.Pop();
+					else
+						previousRichTextTags.Pop();
+				}
+				void AddTag () => previousRichTextTags.Push(currentRichTextTag);
+				void ClearTags() => previousRichTextTags.Clear();
+
 				void AddLastTextWithRichTextTag (RichTextTag tag)
 				{
 					//Don't add if no text content to add.
@@ -156,11 +176,9 @@ namespace Vertx
 					string text = richText.Substring(lastNewTag, (indexOfOpening  - 1) - lastNewTag);
 					Debug.Log($"Added Text: \"{text}\".");
 					resultantRichText.Add(new RichText(tag, text));
+					previousRichTextTags.Push(tag);
 				}
-
-				#if VERBOSE_DEBUGGING
-				Debug.Log($"Resultant Tag: \"{resultantTag}\".");
-				#endif
+				
 				currentIndex = indexOfClosing + 1;
 				lastNewTag = currentIndex;
 
