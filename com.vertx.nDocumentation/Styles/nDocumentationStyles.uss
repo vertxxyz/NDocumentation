@@ -1,3 +1,5 @@
+/* SCROLL VIEW */
+
 .scroll-view {
 	flex : 1;
 }
@@ -9,11 +11,13 @@
 	background-color: #383838;
 }
 
-.injected-button-wrapper {
+/* CONTAINERS */
+
+.injected-button-container {
 
 }
 
-.content-wrapper {
+.content-container {
 	margin-left : 2px;
 	margin-right : 2px;
 	flex-wrap : wrap;
@@ -22,9 +26,16 @@
 	flex-direction : column;
 }
 
-.content-addition-wrapper {
+.content-addition-container {
 
 }
+
+.paragraph-container {
+	padding: 0px 0px 0px 0px;
+	margin: 0px 0px 0px 0px;
+}
+
+/* BUTTONS */
 
 .injected-button {
 	-unity-font-style : bold;
@@ -50,6 +61,8 @@
 	border-bottom-width: 1px;
 }
 
+/* TEXT & HEADERS */
+
 .plain-text {
 	color: #B5B5B5;
 	padding: 0px 0px 0px 0px;
@@ -63,6 +76,8 @@
 	font-size: 24px;
 	-unity-font-style : bold;
 }
+
+/* SPLITTERS */
 
 .splitter {
 	align-self: stretch;

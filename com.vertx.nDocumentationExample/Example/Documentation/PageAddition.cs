@@ -9,7 +9,7 @@ namespace Vertx.Example
         public override float Order => 0;
         public override void DrawDocumentation(DocumentationWindow window, VisualElement root)
         {
-            window.AddPlainText($"This content after the header has been injected into the page using a {nameof(DocumentationPageAddition)}");
+            window.AddPlainText($"This content after the header has been injected into the page using a {nameof(DocumentationPageAddition)}.");
         }
     }
 }

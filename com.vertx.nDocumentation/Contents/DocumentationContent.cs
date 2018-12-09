@@ -117,7 +117,7 @@ namespace Vertx
 							this.pageRoot = pageRoot;
 							break;
 						default:
-							throw new NotImplementedException();
+							throw new ArgumentOutOfRangeException();
 					}
 
 					iDoc.Initialise(window);
@@ -212,7 +212,8 @@ namespace Vertx
 			}
 
 
-			VisualElement root = GetRoot(null);
+			VisualElement root = contentRoot;
+			SetCurrentDefaultRoot(root);
 			root.Clear();
 
 			//Constant header
@@ -243,7 +244,7 @@ namespace Vertx
 				foreach (ButtonInjection button in buttons)
 				{
 					DocumentationPage pageOfOrigin = button.pageOfOrigin;
-					window.AddHeaderButton(pageOfOrigin.Title, pageOfOrigin.Color, () => GoToPage(pageOfOrigin.GetType().FullName));
+					window.AddFullWidthButton(pageOfOrigin.Title, pageOfOrigin.Color, () => GoToPage(pageOfOrigin.GetType().FullName));
 				}
 			}
 
@@ -386,6 +387,47 @@ namespace Vertx
 			t = Resources.Load<Texture2D>(textureName);
 			helpTextures.Add(textureName, t);
 			return t;
+		}
+
+		#endregion
+
+		#region Button Registry
+
+		private readonly Dictionary<string, Action> _buttonRegistry = new Dictionary<string, Action>();
+
+		public bool RegisterButton(string key, Action action)
+		{
+			if (_buttonRegistry.ContainsKey(key))
+			{
+				Debug.LogWarning($"\"{key}\" already exists in button registry, please find another key.");
+				return false;
+			}
+
+			if (action == null)
+			{
+				Debug.LogWarning($"Action provided with \"{key}\" cannot be null.");
+				return false;
+			}
+			_buttonRegistry.Add(key, action);
+			return true;
+		}
+
+		public bool GetRegisteredButtonAction(string key, out Action action)
+		{
+			if (!_buttonRegistry.TryGetValue(key, out action))
+			{
+				Debug.LogError($"\"{key}\" does not exist in button registry. This likely means you have not registered the action from the Initialise function in your documentation.");
+				return false;
+			}
+			return true;
+		}
+
+		private bool InvokeRegisteredButton(string key)
+		{
+			if (!GetRegisteredButtonAction(key, out var action))
+				return false;
+			action.Invoke();
+			return true;
 		}
 
 		#endregion
