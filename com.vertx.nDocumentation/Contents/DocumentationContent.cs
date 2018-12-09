@@ -224,6 +224,7 @@ namespace Vertx
 				AddInjectedButtons(buttonsAbove);
 
 			//Documentation
+			SetCurrentDefaultRoot(root);
 			page.DrawDocumentation(window, root);
 
 			//Additions
@@ -241,6 +242,11 @@ namespace Vertx
 
 			void AddInjectedButtons(List<ButtonInjection> buttons)
 			{
+				VisualElement injectedButtonContainer = new VisualElement();
+				injectedButtonContainer.AddToClassList("injected-button-container");
+				AddToRoot(injectedButtonContainer);
+				SetCurrentDefaultRoot(injectedButtonContainer);
+				
 				foreach (ButtonInjection button in buttons)
 				{
 					DocumentationPage pageOfOrigin = button.pageOfOrigin;

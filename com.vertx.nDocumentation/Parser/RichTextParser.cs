@@ -1,4 +1,4 @@
-﻿#define VERBOSE_DEBUGGING
+﻿//#define VERBOSE_DEBUGGING
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -174,7 +174,11 @@ namespace Vertx
 					if (lastNewTag == indexOfOpening - 1)
 						return;
 					string text = richText.Substring(lastNewTag, (indexOfOpening  - 1) - lastNewTag);
+
+					#if VERBOSE_DEBUGGING
 					Debug.Log($"Added Text: \"{text}\".");
+					#endif
+					
 					resultantRichText.Add(new RichText(tag, text));
 					previousRichTextTags.Push(tag);
 				}
