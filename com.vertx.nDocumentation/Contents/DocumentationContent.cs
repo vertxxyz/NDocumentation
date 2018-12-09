@@ -403,6 +403,12 @@ namespace Vertx
 
 		public bool RegisterButton(string key, Action action)
 		{
+			if (pages.ContainsKey(key))
+			{
+				Debug.LogWarning($"\"{key}\" already exists as a page, pages are automatically added to the button registry.");
+				return false;
+			}
+
 			if (_buttonRegistry.ContainsKey(key))
 			{
 				Debug.LogWarning($"\"{key}\" already exists in button registry, please find another key.");
@@ -420,12 +426,16 @@ namespace Vertx
 
 		public bool GetRegisteredButtonAction(string key, out Action action)
 		{
-			if (!_buttonRegistry.TryGetValue(key, out action))
+			if (pages.TryGetValue(key, out var page))
 			{
-				Debug.LogError($"\"{key}\" does not exist in button registry. This likely means you have not registered the action from the Initialise function in your documentation.");
-				return false;
+				action = () => GoToPage(page.GetType().FullName);
+				return true;
 			}
-			return true;
+
+			if (_buttonRegistry.TryGetValue(key, out action))
+				return true;
+			Debug.LogError($"\"{key}\" does not exist in button registry. This likely means you have not registered the action from the Initialise function in your documentation.");
+			return false;
 		}
 
 		private bool InvokeRegisteredButton(string key)

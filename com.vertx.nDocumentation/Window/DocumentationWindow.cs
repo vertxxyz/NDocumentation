@@ -178,6 +178,20 @@ namespace Vertx
 
 		#endregion
 
+		#region Buttons
+
+		public Button AddInlineButton(string key, VisualElement root)
+		{
+			if (!content.GetRegisteredButtonAction(key, out Action action))
+				return null;
+			Button inlineButton = new Button(action);
+			inlineButton.AddToClassList("inline-button");
+			content.AddToRoot(inlineButton);
+			return inlineButton;
+		}
+
+		#endregion
+
 		#region Splitters
 
 		public VisualElement AddSplitter(bool halfSize = false, bool inverseColor = false, VisualElement root = null)

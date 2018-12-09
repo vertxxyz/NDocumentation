@@ -153,8 +153,38 @@ namespace Vertx
 								Exit();
 								return resultantRichText;
 							}
-
 							break;
+					}
+
+					//SIZE
+					if (resultantTag.StartsWith("size"))
+					{
+						if (!GetStringVariables("size", out string stringVariables))
+							continue;
+						if (!int.TryParse(stringVariables, out int size))
+						{
+							Debug.Log($"Size tag \"{resultantTag}\" does not contain a parseable integer.");
+							RichTextDebugHighlit(indexOfOpening, indexOfClosing);
+							continue;
+						}
+						AddLastTextWithRichTextTag(currentRichTextTag);
+						currentRichTextTag = currentRichTextTag.GetWithNewSize(size);
+						AddTag();
+					}
+
+					bool GetStringVariables(string tag, out string stringVariables)
+					{
+						stringVariables = null;
+						int indexOfEquals = resultantTag.IndexOf('=', tag.Length);
+						if (indexOfEquals < 0)
+						{
+							Debug.Log($"{tag} tag \"{resultantTag}\" does not contain an = and variables.");
+							RichTextDebugHighlit(indexOfOpening, indexOfClosing);
+							return false;
+						}
+
+						stringVariables = resultantTag.Substring(indexOfEquals).Replace(" ", string.Empty);
+						return true;
 					}
 				}
 
@@ -283,6 +313,7 @@ namespace Vertx
 			public RichTextTag GetWithRemovedBold() => new RichTextTag(tag, fontStyle == FontStyle.Bold ? FontStyle.Normal : FontStyle.Italic, color, size, stringVariables);
 			public RichTextTag GetWithAddedItalics() => new RichTextTag(tag, fontStyle == FontStyle.Normal ? FontStyle.Italic : FontStyle.BoldAndItalic, color, size, stringVariables);
 			public RichTextTag GetWithRemovedItalics() => new RichTextTag(tag, fontStyle == FontStyle.Bold ? FontStyle.Normal : FontStyle.Bold, color, size, stringVariables);
+			public RichTextTag GetWithNewSize (int size) => new RichTextTag(tag, fontStyle, color, size, stringVariables);
 
 			public bool Equals(RichTextTag a, RichTextTag b) =>
 				a.color == b.color &&

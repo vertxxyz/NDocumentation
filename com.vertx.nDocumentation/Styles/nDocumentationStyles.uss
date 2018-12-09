@@ -62,10 +62,21 @@
 
 .injected-button:hover {
 	border-color: #666666;
+}
+
+.inline-button {
+	background-image : none;
+	background-color : #282828;
+	margin: 0px;
 	border-left-width: 1px;
 	border-top-width: 1px;
 	border-right-width: 1px;
 	border-bottom-width: 1px;
+	cursor: link;
+}
+
+.inline-button:hover {
+	border-color: #666666;
 }
 
 /* TEXT & HEADERS */
