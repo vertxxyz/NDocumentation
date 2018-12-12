@@ -12,10 +12,10 @@ namespace Vertx.Example
         public override string Title => "Creating Pages";
         public override void DrawDocumentation(DocumentationWindow window, VisualElement root)
         {
-            window.AddHeader("Creating Pages", 18, FontStyle.Normal);
+            window.AddHeader(Title, 18, FontStyle.Normal);
             window.AddRichText("<b>Bold text</b>. <i>italics text</>. <b><i>bold italics</b>.</i> <size=20>Large Text</>");
 
-            window.AddRichText($"{extendingPages} is possible.");
+            window.AddRichText($"{ExtendingPagesButton} is possible.");
         }
     }
 }

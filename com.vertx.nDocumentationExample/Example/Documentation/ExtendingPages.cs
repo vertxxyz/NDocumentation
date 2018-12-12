@@ -12,10 +12,10 @@ namespace Vertx.Example
         public override string Title => "Extending Pages";
         public override void DrawDocumentation(DocumentationWindow window, VisualElement root)
         {
-            window.AddHeader("Extending Pages", 18, FontStyle.Normal);
+            window.AddHeader(Title, 18, FontStyle.Normal);
         }
 
         public static readonly Color ExtendColor = new Color(1f, 0.87f, 0.32f);
-        public static readonly string extendingPages = GetButtonString(typeof(ExtendingPages), GetColouredString("Extending Pages", ExtendColor));
+        public static readonly string ExtendingPagesButton = GetButtonString(typeof(ExtendingPages), GetColouredString("Extending Pages", ExtendColor));
     }
 }
