@@ -94,12 +94,18 @@ namespace Vertx
 
 		public List<VisualElement> AddRichText(string text, VisualElement root = null)
 		{
+			VisualElement rootTemp = content.GetRoot(null);
 			List<VisualElement> results = new List<VisualElement>();
 			IEnumerable<RichText> richTexts = ParseRichText(text);
 			//Parse rich texts to create paragraphs.
 			List<List<RichText>> paragraphs = new List<List<RichText>> {new List<RichText>()};
 			foreach (RichText richText in richTexts)
 			{
+				if (richText.richTextTag.tag == RichTextTag.Tag.button || richText.richTextTag.tag == RichTextTag.Tag.code)
+				{
+					paragraphs[paragraphs.Count - 1].Add(richText);
+					continue;
+				}
 				string[] strings = richText.associatedText.Split('\n');
 				for (int i = 0; i < strings.Length; i++)
 				{
@@ -148,8 +154,23 @@ namespace Vertx
 					//TODO ----------------------------------------------------------------------------------
 					void AddRichText(RichText richText)
 					{
-						Label inlineText = AddInlineText(richText.associatedText);
 						RichTextTag tag = richText.richTextTag;
+						TextElement inlineText;
+						switch (tag.tag)
+						{
+							case RichTextTag.Tag.none:
+								inlineText = AddInlineText(richText.associatedText, root);
+								break;
+							case RichTextTag.Tag.button:
+								inlineText = AddInlineButton(tag.stringVariables, richText.associatedText, root);
+								break;
+							case RichTextTag.Tag.code:
+							case RichTextTag.Tag.span:
+							case RichTextTag.Tag.image:
+								throw new NotImplementedException();
+							default:
+								throw new ArgumentOutOfRangeException();
+						}
 						inlineText.style.unityFontStyleAndWeight = tag.fontStyle;
 						if (tag.size > 0)
 							inlineText.style.fontSize = tag.size;
@@ -161,6 +182,7 @@ namespace Vertx
 				}
 			}
 
+			content.SetCurrentDefaultRoot(rootTemp);
 			return results;
 		}
 		
@@ -180,13 +202,16 @@ namespace Vertx
 
 		#region Buttons
 
-		public Button AddInlineButton(string key, VisualElement root)
+		public Button AddInlineButton(string key, string text, VisualElement root = null)
 		{
 			if (!content.GetRegisteredButtonAction(key, out Action action))
 				return null;
-			Button inlineButton = new Button(action);
+			Button inlineButton = new Button(action)
+			{
+				text = text
+			};
 			inlineButton.AddToClassList("inline-button");
-			content.AddToRoot(inlineButton);
+			content.AddToRoot(inlineButton, root);
 			return inlineButton;
 		}
 

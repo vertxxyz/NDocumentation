@@ -66,6 +66,7 @@
 }
 
 .inline-button {
+	-unity-text-align: lower-left;
 	background-image : none;
 	background-color : #282828;
 	margin: 0px;
@@ -73,17 +74,22 @@
 	border-top-width: 1px;
 	border-right-width: 1px;
 	border-bottom-width: 1px;
+	padding: 0px;
 	cursor: link;
 }
 
 .inline-button:hover {
+	color: #B5B5B5;
 	border-color: #666666;
 }
 
 /* TEXT & HEADERS */
 
-.plain-text {
+.unity-text-element {
 	color: #B5B5B5;
+}
+
+.plain-text {
 	padding: 0px;
 	margin: 2px, 5px, 5px, 16px;
 	-unity-word-wrap: true;
@@ -91,7 +97,6 @@
 }
 
 .inline-text {
-	color: #B5B5B5;
 	padding: 0px;
 	margin: 0px;
 }

@@ -1,4 +1,5 @@
 ﻿//#define VERBOSE_DEBUGGING
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,17 +20,17 @@ namespace Vertx
 			Valid,
 			End
 		}
-		
+
 		public static IEnumerable<RichText> ParseRichText(string richText)
 		{
 			List<RichText> resultantRichText = new List<RichText>();
-			
+
 			RichTextTag currentRichTextTag = new RichTextTag();
 			Stack<RichTextTag> previousRichTextTags = new Stack<RichTextTag>();
 			int currentIndex = 0;
 			int length = richText.Length;
 			int lastNewTag = 0;
-			
+
 			//Loop through the whole string
 			while (currentIndex < length)
 			{
@@ -51,9 +52,10 @@ namespace Vertx
 						default:
 							throw new ArgumentOutOfRangeException();
 					}
+
 					currentSearchingIndex = indexOfOpening + 1;
 				}
-				
+
 				//Now we have the index of a possible starting delimiter look for the ending delimiter.
 				int indexOfClosing = richText.IndexOf(closingTagDelimiter, currentSearchingIndex);
 				if (indexOfClosing < 0)
@@ -61,6 +63,7 @@ namespace Vertx
 					Exit();
 					return resultantRichText;
 				}
+
 				//Make sure that that closing delimiter doesn't have an opening delimiter behind it.
 				while (true)
 				{
@@ -77,11 +80,12 @@ namespace Vertx
 						default:
 							throw new ArgumentOutOfRangeException();
 					}
+
 					break;
 				}
 
-				string resultantTag = richText.Substring(indexOfOpening, indexOfClosing-indexOfOpening);
-				
+				string resultantTag = richText.Substring(indexOfOpening, indexOfClosing - indexOfOpening);
+
 				#if VERBOSE_DEBUGGING
 				Debug.Log($"<color=green>{GetRichTextCapableText($"<{resultantTag}>")}</color>");
 				#endif
@@ -93,7 +97,7 @@ namespace Vertx
 					{
 						//Once closing the code tag we should 
 						CsharpHighlighter highlighter = new CsharpHighlighter();
-						string highlit = highlighter.Highlight(richText.Substring(lastNewTag, indexOfOpening-lastNewTag));
+						string highlit = highlighter.Highlight(richText.Substring(lastNewTag, indexOfOpening - lastNewTag));
 						Debug.Log($"Highlit: \"{highlit}\"");
 						//TODO finish code implementation
 					}
@@ -141,6 +145,7 @@ namespace Vertx
 								Exit();
 								return resultantRichText;
 							}
+
 							AddLastTextWithRichTextTag(currentRichTextTag);
 							currentRichTextTag = new RichTextTag(Tag.code, FontStyle.Normal, Color.clear, 0, null);
 							ClearTags();
@@ -153,11 +158,21 @@ namespace Vertx
 								Exit();
 								return resultantRichText;
 							}
+
+							break;
+						case "/button":
+							AddLastTextWithRichTextTag(currentRichTextTag);
+							currentRichTextTag = currentRichTextTag.GetWithRemovedButton();
+							RemoveTag();
+							break;
+						case "/color":
+							AddLastTextWithRichTextTag(currentRichTextTag);
+							currentRichTextTag = currentRichTextTag.GetWithRemovedColor();
+							RemoveTag();
 							break;
 					}
 
-					//SIZE
-					if (resultantTag.StartsWith("size"))
+					if (resultantTag.StartsWith("size")) //SIZE
 					{
 						if (!GetStringVariables("size", out string stringVariables))
 							continue;
@@ -170,6 +185,38 @@ namespace Vertx
 						{
 							AddLastTextWithRichTextTag(currentRichTextTag);
 							currentRichTextTag = currentRichTextTag.GetWithNewSize(size);
+							AddTag();
+						}
+					}
+					else if (resultantTag.StartsWith("button")) //BUTTON
+					{
+						if (!GetStringVariables("button", out string stringVariables))
+							continue;
+						if (string.IsNullOrEmpty(stringVariables))
+						{
+							Debug.Log($"Button tag \"{resultantTag}\" does not contain a key. \"{stringVariables}\"");
+							RichTextDebugHighlit(indexOfOpening, indexOfClosing);
+						}
+						else
+						{
+							AddLastTextWithRichTextTag(currentRichTextTag);
+							currentRichTextTag = currentRichTextTag.GetWithButton(stringVariables);
+							AddTag();
+						}
+					}
+					else if (resultantTag.StartsWith("color"))
+					{
+						if (!GetStringVariables("color", out string stringVariables))
+							continue;
+						if (!ColorUtility.TryParseHtmlString(stringVariables, out Color colour))
+						{
+							Debug.Log($"Color tag \"{resultantTag}\" does not contain a HTML colour. \"{stringVariables}\"");
+							RichTextDebugHighlit(indexOfOpening, indexOfClosing);
+						}
+						else
+						{
+							AddLastTextWithRichTextTag(currentRichTextTag);
+							currentRichTextTag = currentRichTextTag.GetWithNewColor(colour);
 							AddTag();
 						}
 					}
@@ -190,30 +237,32 @@ namespace Vertx
 					}
 				}
 
-				void RemoveTag (bool assignTag = false)
+				void RemoveTag(bool assignTag = false)
 				{
-					if(assignTag)
+					if (assignTag)
 						currentRichTextTag = previousRichTextTags.Pop();
 					else
 						previousRichTextTags.Pop();
 				}
-				void AddTag () => previousRichTextTags.Push(currentRichTextTag);
+
+				void AddTag() => previousRichTextTags.Push(currentRichTextTag);
 				void ClearTags() => previousRichTextTags.Clear();
-				void AddLastTextWithRichTextTag (RichTextTag tag)
+
+				void AddLastTextWithRichTextTag(RichTextTag tag)
 				{
 					//Don't add if no text content to add.
 					if (lastNewTag == indexOfOpening - 1)
 						return;
-					string text = richText.Substring(lastNewTag, (indexOfOpening  - 1) - lastNewTag);
+					string text = richText.Substring(lastNewTag, (indexOfOpening - 1) - lastNewTag);
 
 					#if VERBOSE_DEBUGGING
 					Debug.Log($"Added Text: \"{text}\".");
 					#endif
-					
+
 					resultantRichText.Add(new RichText(tag, text));
 					previousRichTextTags.Push(tag);
 				}
-				
+
 				currentIndex = indexOfClosing + 1;
 				lastNewTag = currentIndex;
 
@@ -242,29 +291,30 @@ namespace Vertx
 				}
 
 				string NotParsedError() => "This text has not been parsed beyond this point.";
-				void RichTextDebug () => Debug.Log(richText);
+				void RichTextDebug() => Debug.Log(richText);
 				void RichTextDebugHighlit(int highlightStart, int highlightEnd) => Debug.LogWarning($"{GetRichTextCapableText(richText.Substring(0, highlightStart))}<color=red>{GetRichTextCapableText(richText.Substring(highlightStart, highlightEnd - highlightStart))}</color>{GetRichTextCapableText(richText.Substring(highlightEnd))}");
 				string GetRichTextCapableText(string text) => text.Replace("<", "<<b></b>");
 			}
 
-			
+
 			Exit();
 			return resultantRichText;
-			
+
 			void Exit() => resultantRichText.Add(new RichText(currentRichTextTag, richText.Substring(currentIndex)));
 		}
-		
+
 		public struct RichText
 		{
 			public readonly RichTextTag richTextTag;
 			public readonly string associatedText;
+
 			public RichText(RichTextTag richTextTag, string associatedText)
 			{
 				this.richTextTag = richTextTag;
 				this.associatedText = associatedText;
 			}
 		}
-		
+
 		public struct RichTextTag : IEqualityComparer<RichTextTag>
 		{
 			public enum Tag
@@ -275,23 +325,24 @@ namespace Vertx
 				span,
 				image
 			}
+
 			public readonly Tag tag;
-			
+
 			/// <summary>
 			/// Font Style (Normal, Bold, Bold-Italic, etc)
 			/// </summary>
 			public readonly FontStyle fontStyle;
-			
+
 			/// <summary>
 			/// The colour of the text
 			/// </summary>
 			public readonly Color color;
-			
+
 			/// <summary>
 			/// Font Size.
 			/// </summary>
 			public readonly int size;
-			
+
 			/// <summary>
 			/// Variables provided with things like buttons.
 			/// </summary>
@@ -314,7 +365,11 @@ namespace Vertx
 			public RichTextTag GetWithRemovedBold() => new RichTextTag(tag, fontStyle == FontStyle.Bold ? FontStyle.Normal : FontStyle.Italic, color, size, stringVariables);
 			public RichTextTag GetWithAddedItalics() => new RichTextTag(tag, fontStyle == FontStyle.Normal ? FontStyle.Italic : FontStyle.BoldAndItalic, color, size, stringVariables);
 			public RichTextTag GetWithRemovedItalics() => new RichTextTag(tag, fontStyle == FontStyle.Bold ? FontStyle.Normal : FontStyle.Bold, color, size, stringVariables);
-			public RichTextTag GetWithNewSize (int size) => new RichTextTag(tag, fontStyle, color, size, stringVariables);
+			public RichTextTag GetWithNewSize(int size) => new RichTextTag(tag, fontStyle, color, size, stringVariables);
+			public RichTextTag GetWithNewColor(Color color) => new RichTextTag(tag, fontStyle, color, size, stringVariables);
+			public RichTextTag GetWithRemovedColor() => new RichTextTag(tag, fontStyle, Color.clear, size, stringVariables);
+			public RichTextTag GetWithButton(string stringVariables) => new RichTextTag(Tag.button, fontStyle, color, size, stringVariables);
+			public RichTextTag GetWithRemovedButton() => new RichTextTag(Tag.none, fontStyle, color, size, null);
 
 			public bool Equals(RichTextTag a, RichTextTag b) =>
 				a.color == b.color &&

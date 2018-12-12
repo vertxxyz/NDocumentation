@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using static Vertx.DocumentationPage;
-using static Vertx.NDocumentationUtility;
+using static Vertx.DocumentationUtility;
 
 namespace Vertx
 {
@@ -390,7 +390,7 @@ namespace Vertx
 		private static Texture GetTexture(string textureName)
 		{
 			if (helpTextures.TryGetValue(textureName, out Texture t)) return t;
-			t = Resources.Load<Texture2D>(textureName);
+			t = LoadAssetOfType<Texture2D>(textureName);
 			helpTextures.Add(textureName, t);
 			return t;
 		}
