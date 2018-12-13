@@ -1,0 +1,17 @@
+/* COLOURS */
+
+.keyword {
+    color: #569CD6;
+}
+
+.type {
+    color: #4EC9B0;
+}
+
+.comment {
+    color: #57A64A;
+}
+
+.quotes {
+    color: #D69D85;
+}

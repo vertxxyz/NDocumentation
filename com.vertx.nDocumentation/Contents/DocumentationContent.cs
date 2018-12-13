@@ -56,8 +56,11 @@ namespace Vertx
 				}
 			};
 			root.Add(browserBar);
-			StyleSheet styleSheet = LoadAssetOfType<StyleSheet>("nDocumentationStyles", SearchFilter.Packages);
-			root.styleSheets.Add(styleSheet);
+			StyleSheet docsStyleSheet = LoadAssetOfType<StyleSheet>("nDocumentationStyles", SearchFilter.Packages);
+			root.styleSheets.Add(docsStyleSheet);
+
+			StyleSheet codeStyleSheet = LoadAssetOfType<StyleSheet>("CsharpHighlightingStyles", SearchFilter.Packages);
+			root.styleSheets.Add(codeStyleSheet);
 
 			ScrollView scrollView = new ScrollView
 			{

@@ -141,21 +141,21 @@ namespace Vertx
 							content.AddToRoot(inlineGroup, lastRoot);
 							inlineGroup.AddToClassList("inline-text-group");
 							content.SetCurrentDefaultRoot(inlineGroup);
-							AddRichText(word);
-							AddRichText(nextWord);
+							AddRichTextInternal(word);
+							AddRichTextInternal(nextWord);
 							content.SetCurrentDefaultRoot(lastRoot);
 							++i;
 							continue;
 						}
 					}
-					AddRichText(word);
+					AddRichTextInternal(word);
 
 					//Add all the words and style them.
 					//TODO ----------------------------------------------------------------------------------
-					void AddRichText(RichText richText)
+					void AddRichTextInternal(RichText richText)
 					{
 						RichTextTag tag = richText.richTextTag;
-						TextElement inlineText;
+						TextElement inlineText = null;
 						switch (tag.tag)
 						{
 							case RichTextTag.Tag.none:
@@ -165,18 +165,31 @@ namespace Vertx
 								inlineText = AddInlineButton(tag.stringVariables, richText.associatedText, root);
 								break;
 							case RichTextTag.Tag.code:
+								AddRichText(richText.associatedText, root);
+								break;
 							case RichTextTag.Tag.span:
+								Label spanLabel = new Label
+								{
+									text = text
+								};
+								spanLabel.AddToClassList(tag.stringVariables);
+								content.AddToRoot(spanLabel, root);
+								break;
 							case RichTextTag.Tag.image:
 								throw new NotImplementedException();
 							default:
 								throw new ArgumentOutOfRangeException();
 						}
-						inlineText.style.unityFontStyleAndWeight = tag.fontStyle;
-						if (tag.size > 0)
-							inlineText.style.fontSize = tag.size;
-						if(tag.color != Color.clear)
-							inlineText.style.color = tag.color;
-						results.Add(inlineText);
+
+						if (inlineText != null)
+						{
+							inlineText.style.unityFontStyleAndWeight = tag.fontStyle;
+							if (tag.size > 0)
+								inlineText.style.fontSize = tag.size;
+							if (tag.color != Color.clear)
+								inlineText.style.color = tag.color;
+							results.Add(inlineText);
+						}
 					}
 					//TODO ----------------------------------------------------------------------------------
 				}

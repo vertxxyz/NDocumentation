@@ -4,7 +4,7 @@ using static Vertx.Example.ExtendingPages;
 
 namespace Vertx.Example
 {
-    public class ExamplePage : DocumentationPage
+    public class CreatingPage : DocumentationPage
     {
         public override ButtonInjection[] InjectButtonLinkAbove => null;
         public override ButtonInjection[] InjectButtonLinkBelow => new []{new ButtonInjection(typeof(LandingPage), 0)};
@@ -13,7 +13,7 @@ namespace Vertx.Example
         public override void DrawDocumentation(DocumentationWindow window, VisualElement root)
         {
             window.AddHeader(Title, 18, FontStyle.Normal);
-            window.AddRichText("<b>Bold text</b>. <i>italics text</>. <b><i>bold italics</b>.</i> <size=20>Large Text</>");
+            window.AddRichText("<b>Bold text</b>. <i>italics text</>. normal text <b><i>bold italics</>.</> <size=20>Large Text</>");
 
             window.AddRichText($"{ExtendingPagesButton} is possible.");
         }
