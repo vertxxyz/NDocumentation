@@ -249,6 +249,8 @@ namespace Vertx
 			}
 
 			// Highlight class names based on the logic: {space OR start of line OR >}{1 capital){alphanumeric}{space}
+			// \w is a "word character" (ie. alphanumeric). "+" means one or more of preceding
+			// (?:"") is a non-capturing group.
 			regex = new Regex($@"(?:{startBracket}|\s|^)([A-Z]\w+(?:\s))", RegexOptions.Singleline);
 			if (regex.IsMatch(content))
 			{

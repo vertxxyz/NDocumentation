@@ -119,14 +119,6 @@ namespace Vertx
 					//When inside the a code tag we ignore all tags except the closing of a code tag.
 					if (resultantTag.Equals("/code"))
 					{
-						//Once closing the code tag we should 
-						CsharpHighlighter highlighter = new CsharpHighlighter
-						{
-							AddStyleDefinition = false
-						};
-						string highlit = highlighter.Highlight(richText.Substring(lastNewTag, indexOfOpening - lastNewTag));
-						Debug.Log($"Highlit: \"{highlit}\"");
-
 						AddLastTextWithRichTextTag(currentRichTextTag, false);
 						currentRichTextTag = default;
 						ClearTags();
@@ -257,7 +249,11 @@ namespace Vertx
 								currentRichTextTag = currentRichTextTag.GetWithNewColor(colour);
 							}
 						}
-						else if (ParseForSpan(resultantTag)) { }
+						else if (ParseForSpan(resultantTag, out string styleClass))
+						{
+							AddLastTextWithRichTextTag(currentRichTextTag);
+							currentRichTextTag = currentRichTextTag.GetWithSpan(styleClass);
+						}
 					}
 
 					//Gets the plain string variables following a tag.
@@ -322,12 +318,10 @@ namespace Vertx
 			void Exit() => resultantRichText.Add(new RichText(currentRichTextTag, richText.Substring(currentIndex)));
 		}
 
-		static bool ParseForSpan(string resultantTag)
+		static bool ParseForSpan(string resultantTag, out string styleClass)
 		{
-			Debug.Log(resultantTag);
 			if (resultantTag.StartsWith("span "))
 			{
-				Debug.Log("Span");
 				int indexOfClass = resultantTag.IndexOf("class=", "span ".Length, StringComparison.Ordinal);
 				if (indexOfClass >= 0)
 					indexOfClass += "class=".Length;
@@ -344,14 +338,13 @@ namespace Vertx
 				}
 				else
 				{
-					string restOfTag = resultantTag.Substring(indexOfClass);
-					Debug.Log(restOfTag);
-					/*AddLastTextWithRichTextTag(currentRichTextTag);
-					currentRichTextTag = currentRichTextTag.GetWithSpan(stringVariables);*/
+					string restOfTag = resultantTag.Substring(indexOfClass+1, (resultantTag.Length-(indexOfClass+1)) -1);
+					styleClass = restOfTag;
 					return true;
 				}
 			}
 
+			styleClass = null;
 			return false;
 		}
 

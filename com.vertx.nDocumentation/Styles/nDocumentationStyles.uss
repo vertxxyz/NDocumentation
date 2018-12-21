@@ -122,3 +122,31 @@
 .splitter.inverse {
 	background-color : #1E1E1E;
 }
+
+/* CODE */
+
+.code-button-container {
+	background-image: none;
+	background-color: #1E1E1E;
+	margin: 0;
+	padding: 0;
+	border-width: 1px;
+	border-top-left-radius: 6px;
+	border-top-right-radius: 6px;
+	border-color: #a66a54;
+	cursor: link;
+}
+
+/*.code-scroll {*/
+	/*overflow-x: scroll;*/
+	/*overflow-y: hidden;*/
+/*}*/
+
+/*.code-container {*/
+	/*flex-direction: column;*/
+/*}*/
+
+.paragraph-container.code {
+	align-self: flex-start;
+	flex-wrap: nowrap;
+}

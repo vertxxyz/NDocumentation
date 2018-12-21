@@ -94,6 +94,8 @@ namespace Vertx
 
 		public List<VisualElement> AddRichText(string text, VisualElement root = null)
 		{
+//			Debug.Log($"AddRichText: {text}");
+
 			VisualElement rootTemp = content.GetRoot(null);
 			List<VisualElement> results = new List<VisualElement>();
 			IEnumerable<RichText> richTexts = ParseRichText(text);
@@ -128,7 +130,6 @@ namespace Vertx
 				for (int i = 0; i < paragraph.Count; i++)
 				{
 					RichText word = paragraph[i];
-
 					if (i < paragraph.Count - 1)
 					{
 						//If there are more words 
@@ -165,12 +166,49 @@ namespace Vertx
 								inlineText = AddInlineButton(tag.stringVariables, richText.associatedText, root);
 								break;
 							case RichTextTag.Tag.code:
-								AddRichText(richText.associatedText, root);
+								VisualElement lastRoot = content.GetRoot(null);
+								//Button
+								Button codeCopyButtonButtonContainer = new Button(() =>
+								{
+									EditorGUIUtility.systemCopyBuffer = richText.associatedText;
+									Debug.Log("Copied Code to Clipboard");
+								});
+								codeCopyButtonButtonContainer.AddToClassList("code-button-container");
+								content.AddToRoot(codeCopyButtonButtonContainer);
+								content.SetCurrentDefaultRoot(codeCopyButtonButtonContainer);
+								//Scroll
+								ScrollView codeScroll = new ScrollView(ScrollViewMode.Horizontal);
+								VisualElement contentContainer = codeScroll.contentContainer;
+								codeScroll.AddToClassList("code-scroll");
+								contentContainer.AddToClassList("code-container");
+								//the above doesn't seem to be working so we have to set the style manually for now.
+								contentContainer.style.flexDirection = FlexDirection.Column;
+								content.AddToRoot(codeScroll);
+								content.SetCurrentDefaultRoot(contentContainer);
+								
+								//Once closing the code tag we should 
+								CsharpHighlighter highlighter = new CsharpHighlighter
+								{
+									AddStyleDefinition = false
+								};
+								string highlit = highlighter.Highlight(richText.associatedText);
+//								Debug.Log($"Highlit: \"{highlit}\"");
+								//Code
+								AddRichText(highlit, root);
+								//Finalise content container
+								foreach (VisualElement child in contentContainer.Children())
+								{
+									if(child.ClassListContains(paragraphContainerClass))
+										child.AddToClassList("code");
+								}
+
+								//Reset
+								content.SetCurrentDefaultRoot(lastRoot);
 								break;
 							case RichTextTag.Tag.span:
 								Label spanLabel = new Label
 								{
-									text = text
+									text = richText.associatedText
 								};
 								spanLabel.AddToClassList(tag.stringVariables);
 								content.AddToRoot(spanLabel, root);
@@ -193,6 +231,7 @@ namespace Vertx
 					}
 					//TODO ----------------------------------------------------------------------------------
 				}
+				content.SetCurrentDefaultRoot(rootTemp);
 			}
 
 			content.SetCurrentDefaultRoot(rootTemp);
@@ -248,10 +287,12 @@ namespace Vertx
 
 		#region Containers
 
+		private const string paragraphContainerClass = "paragraph-container";
+
 		private VisualElement AddParagraphContainer(VisualElement root = null)
 		{
 			VisualElement paragraphContainer = new VisualElement();
-			paragraphContainer.AddToClassList("paragraph-container");
+			paragraphContainer.AddToClassList(paragraphContainerClass);
 			content.AddToRoot(paragraphContainer, root);
 			return paragraphContainer;
 		}
