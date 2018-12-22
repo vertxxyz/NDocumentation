@@ -45,36 +45,42 @@
 
 /* BUTTONS */
 
+Button {
+	background-image : none;
+	background-color : #282828;
+	margin: 0;
+	cursor: link;
+	border-width: 1px;
+}
+
 .injected-button {
 	-unity-font-style : bold;
 	-unity-text-align : upper-left;
-	background-image : none;
-	background-color : #282828;
 	height : 20px;
 	align-self : stretch;
 	padding: 1px 5px 1px 12px;
-	margin: 0;
-	border-width: 1px;
-	cursor: link;
+}
+
+.inline-button {
+	-unity-text-align: lower-left;
+	padding: 0;
 }
 
 .injected-button:hover {
 	border-color: #666666;
 }
 
-.inline-button {
-	-unity-text-align: lower-left;
-	background-image : none;
-	background-color : #282828;
-	margin: 0;
-	border-width: 1px;
-	padding: 0;
-	cursor: link;
-}
-
 .inline-button:hover {
 	color: #B5B5B5;
 	border-color: #666666;
+}
+
+.injected-button:active {
+	border-color: #868686;
+}
+
+.inline-button:active {
+	border-color: #868686;
 }
 
 /* TEXT & HEADERS */

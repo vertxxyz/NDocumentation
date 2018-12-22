@@ -54,6 +54,7 @@ namespace Vertx
 					color = textColor
 				}
 			};
+			headerButton.ClearClassList();
 			headerButton.AddToClassList("injected-button");
 			content.AddToRoot(headerButton, root);
 			return headerButton;
@@ -94,7 +95,6 @@ namespace Vertx
 
 		public List<VisualElement> AddRichText(string text, VisualElement root = null)
 		{
-//			Debug.Log($"AddRichText: {text}");
 
 			VisualElement rootTemp = content.GetRoot(null);
 			List<VisualElement> results = new List<VisualElement>();
@@ -125,6 +125,7 @@ namespace Vertx
 			
 			foreach (List<RichText> paragraph in paragraphs)
 			{
+				
 				//Add all the paragraphs
 				content.SetCurrentDefaultRoot(AddParagraphContainer(root));
 				for (int i = 0; i < paragraph.Count; i++)
@@ -192,7 +193,6 @@ namespace Vertx
 									AddStyleDefinition = false
 								};
 								string highlit = highlighter.Highlight(richText.associatedText);
-//								Debug.Log($"Highlit: \"{highlit}\"");
 								//Code
 								AddRichText(highlit, root);
 								//Finalise content container
@@ -262,6 +262,7 @@ namespace Vertx
 			{
 				text = text
 			};
+			inlineButton.ClearClassList();
 			inlineButton.AddToClassList("inline-button");
 			content.AddToRoot(inlineButton, root);
 			return inlineButton;

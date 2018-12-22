@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace Vertx
 {
@@ -250,20 +251,8 @@ namespace Vertx
 
 			// Highlight class names based on the logic: {space OR start of line OR >}{1 capital){alphanumeric}{space}
 			// \w is a "word character" (ie. alphanumeric). "+" means one or more of preceding
-			// (?:"") is a non-capturing group.
-			regex = new Regex($@"(?:{startBracket}|\s|^)([A-Z]\w+(?:\s))", RegexOptions.Singleline);
-			if (regex.IsMatch(content))
-			{
-				foreach (Match item in regex.Matches(content))
-				{
-					string val = item.Groups[1].Value;
-					if (!highlightedClasses.Contains(val))
-						highlightedClasses.Add(val);
-				}
-			}
-
-			foreach (string highlightedClass in highlightedClasses)
-				content = content.ReplaceWithCss(highlightedClass, TypeCssClass);
+			regex = new Regex($@"(?<={startBracket}|\s|^)([A-Z]\w+)(?=\s[^=>])", RegexOptions.Singleline);
+			content = regex.Replace(content, $"<span class=\"{TypeCssClass}\">$1</span>");
 
 			// Pass 2. Doing it in N passes due to my inferior regex knowledge of back/forwardtracking.
 			// This does {space or [}{1 capital){alphanumeric}{]}
