@@ -174,6 +174,7 @@ namespace Vertx
 									EditorGUIUtility.systemCopyBuffer = richText.associatedText;
 									Debug.Log("Copied Code to Clipboard");
 								});
+								codeCopyButtonButtonContainer.ClearClassList();
 								codeCopyButtonButtonContainer.AddToClassList("code-button-container");
 								content.AddToRoot(codeCopyButtonButtonContainer);
 								content.SetCurrentDefaultRoot(codeCopyButtonButtonContainer);
@@ -181,11 +182,15 @@ namespace Vertx
 								ScrollView codeScroll = new ScrollView(ScrollViewMode.Horizontal);
 								VisualElement contentContainer = codeScroll.contentContainer;
 								codeScroll.AddToClassList("code-scroll");
-								contentContainer.AddToClassList("code-container");
-								//the above doesn't seem to be working so we have to set the style manually for now.
-								contentContainer.style.flexDirection = FlexDirection.Column;
 								content.AddToRoot(codeScroll);
 								content.SetCurrentDefaultRoot(contentContainer);
+								
+								VisualElement codeContainer = new VisualElement();
+								codeContainer.ClearClassList();
+								codeContainer.AddToClassList("code-container");
+								//the above doesn't seem to be working so we have to set the style manually for now.
+								content.AddToRoot(codeContainer);
+								content.SetCurrentDefaultRoot(codeContainer);
 								
 								//Once closing the code tag we should 
 								CsharpHighlighter highlighter = new CsharpHighlighter
@@ -196,7 +201,7 @@ namespace Vertx
 								//Code
 								AddRichText(highlit, root);
 								//Finalise content container
-								foreach (VisualElement child in contentContainer.Children())
+								foreach (VisualElement child in codeContainer.Children())
 								{
 									if(child.ClassListContains(paragraphContainerClass))
 										child.AddToClassList("code");

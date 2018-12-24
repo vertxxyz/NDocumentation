@@ -143,16 +143,14 @@ Button {
 	cursor: link;
 }
 
-/*.code-scroll {*/
-	/*overflow-x: scroll;*/
-	/*overflow-y: hidden;*/
-/*}*/
-
-/*.code-container {*/
-	/*flex-direction: column;*/
-/*}*/
+.code-container {
+	margin-top: 2px;
+	margin-bottom: 6px;
+	-unity-font: resource("consola");
+	font-size: 12px;
+	flex-direction: column;
+}
 
 .paragraph-container.code {
-	align-self: flex-start;
-	flex-wrap: nowrap;
+	margin: 0px, 5px, 0px, 10px;
 }
