@@ -213,9 +213,7 @@ namespace Vertx
 			}
 
 			for (int i = 0; i < quotes.Count; i++)
-			{
 				content = content.ReplaceToken(quotes[i], QUOTES_TOKEN, i);
-			}
 
 			// Remove the comments next, so they don't get highlighted
 			regex = new Regex("(/{2,3}.+)\n", RegexOptions.Multiline);
@@ -238,38 +236,18 @@ namespace Vertx
 
 			List<string> highlightedClasses = new List<string>();
 			//Highlight types based on the logic <ClassName>
-			regex = new Regex("<([a-zA-Z0-9 ]+)>");
-			if (regex.IsMatch(content))
-			{
-				foreach (Match item in regex.Matches(content))
-				{
-					string val = item.Groups[1].Value;
-					if (!highlightedClasses.Contains(val))
-						highlightedClasses.Add(val);
-				}
-			}
+			regex = new Regex(@"(?<=<)([A-Z]\w+)(?=>)");
+			content = regex.ReplaceWithCSS(content, TypeCssClass);
 
-			// Highlight class names based on the logic: {space OR start of line OR >}{1 capital){alphanumeric}{space}
+			// Highlight class names based on the logic: "{space OR start of line OR >}{1 capital){alphanumeric} " - must not be followed by an =
 			// \w is a "word character" (ie. alphanumeric). "+" means one or more of preceding
-			regex = new Regex($@"(?<={startBracket}|\s|^)([A-Z]\w+)(?=\s[^=>])", RegexOptions.Singleline);
-			content = regex.Replace(content, $"<span class=\"{TypeCssClass}\">$1</span>");
+			regex = new Regex($@"(?<={startBracket}|\s|^)([A-Z]\w+)(?=\s[^=])", RegexOptions.Singleline);
+			content = regex.ReplaceWithCSS(content, TypeCssClass);
 
 			// Pass 2. Doing it in N passes due to my inferior regex knowledge of back/forwardtracking.
-			// This does {space or [}{1 capital){alphanumeric}{]}
-			regex = new Regex(@"(?:\s|\[)([A-Z]\w+)(?:\])", RegexOptions.Singleline);
-			highlightedClasses = new List<string>();
-			if (regex.IsMatch(content))
-			{
-				foreach (Match item in regex.Matches(content))
-				{
-					string val = item.Groups[1].Value;
-					if (!highlightedClasses.Contains(val))
-						highlightedClasses.Add(val);
-				}
-			}
-
-			foreach (string highlightedClass in highlightedClasses)
-				content = content.ReplaceWithCss(highlightedClass, TypeCssClass);
+			// This does {[}{1 capital){alphanumeric}{]}
+			regex = new Regex(@"(?<=\[)([A-Z]\w+)(?=\]|\()", RegexOptions.Singleline);
+			content = regex.ReplaceWithCSS(content, TypeCssClass);
 
 			// Pass 3. Generics
 			regex = new Regex(@"(?:\s|\[|\()([A-Z]\w+(?:<|&lt;))", RegexOptions.Singleline);
@@ -292,33 +270,16 @@ namespace Vertx
 			}
 
 			// Pass 4. new keyword with a type
-			regex = new Regex(@"new\s+([A-Z]\w+)(?:\()", RegexOptions.Singleline);
-			highlightedClasses = new List<string>();
-			if (regex.IsMatch(content))
-			{
-				foreach (Match item in regex.Matches(content))
-				{
-					string val = item.Groups[1].Value;
-					if (!highlightedClasses.Contains(val))
-						highlightedClasses.Add(val);
-				}
-			}
+			regex = new Regex(@"(?<=new\s+)([A-Z]\w+)(?=\()", RegexOptions.Singleline);
+			content = regex.ReplaceWithCSS(content, TypeCssClass);
+			
+			// Pass 5. Array declaration.
+			regex = new Regex(@"(?<=\s)([A-Z]\w+)(?=\[\])", RegexOptions.Singleline);
+			content = regex.ReplaceWithCSS(content, TypeCssClass);
 
 			// Highlight types surrounded by typeof()
-			regex = new Regex($"(?:typeof{startBracket})([a-zA-Z0-9 ]+)(?:{endBracket})");
-			if (regex.IsMatch(content))
-			{
-				foreach (Match item in regex.Matches(content))
-				{
-					string val = item.Groups[1].Value;
-					if (!highlightedClasses.Contains(val))
-						highlightedClasses.Add(val);
-				}
-			}
-
-			// Replace the highlighted classes
-			foreach (string highlightedClass in highlightedClasses)
-				content = content.ReplaceWithCss(highlightedClass, TypeCssClass);
+			regex = new Regex($"(?<=typeof{startBracket})([a-zA-Z0-9 ]+)(?={endBracket})");
+			content = regex.ReplaceWithCSS(content, TypeCssClass);
 
 			// Highlight keywords
 			foreach (string keyword in _keywords)
@@ -348,6 +309,9 @@ namespace Vertx
 
 				content = content.ReplaceTokenWithCss(comment, COMMENTS_TOKEN, i, CommentCssClass);
 			}
+			
+			//Shove the angle brackets back in
+			content = content.Replace("&lt;", "<");
 
 			return content;
 		}
@@ -355,6 +319,8 @@ namespace Vertx
 
 	static class MoreExtensions
 	{
+		public static string ReplaceWithCSS(this Regex regex, string source, string cssClass) => regex.Replace(source, $"<span class=\"{cssClass}\">$1</span>");
+		
 		public static string ReplaceWithCss(this string content, string source, string cssClass) => content.Replace(source, $"<span class=\"{cssClass}\">{source}</span>");
 
 		public static string ReplaceWithCss(this string content, string source, string replacement, string cssClass) => content.Replace(source, $"<span class=\"{cssClass}\">{replacement}</span>");

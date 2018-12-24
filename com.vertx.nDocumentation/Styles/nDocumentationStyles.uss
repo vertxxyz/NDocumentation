@@ -134,7 +134,7 @@ Button {
 .code-button-container {
 	background-image: none;
 	background-color: #1E1E1E;
-	margin: 0;
+	margin: 2px 0px 5px 0px;
 	padding: 0;
 	border-width: 1px;
 	border-top-left-radius: 6px;
@@ -153,4 +153,8 @@ Button {
 
 .paragraph-container.code {
 	margin: 0px, 5px, 0px, 10px;
+}
+
+.inline-text.code {
+	color: #DCDCDC;
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine.UIElements;
+using static Vertx.RichTextUtility;
 
 namespace Vertx.Example
 {
@@ -10,7 +11,7 @@ namespace Vertx.Example
 
 		public override void DrawDocumentation(DocumentationWindow window, VisualElement root)
 		{
-			window.AddRichText($"This content after the header has been injected into the page using a {DocumentationPageAddition}.");
+			window.AddRichText($"This content after the header has been injected into the page using a {DocumentationPageAdditionString}.");
 
 			window.AddRichText(@"<code>public class FooAddition : DocumentationPageAddition
 {
@@ -24,6 +25,6 @@ namespace Vertx.Example
 }</code>");
 		}
 
-		public static readonly string DocumentationPageAddition = RichTextUtility.GetColouredString(nameof(DocumentationPageAddition), ExtendingPages.ExtendColor);
+		public static readonly string DocumentationPageAdditionString = GetColouredString(nameof(DocumentationPageAddition), ExtendingPages.ExtendColor);
 	}
 }

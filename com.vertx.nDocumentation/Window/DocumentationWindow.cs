@@ -153,7 +153,6 @@ namespace Vertx
 					AddRichTextInternal(word);
 
 					//Add all the words and style them.
-					//TODO ----------------------------------------------------------------------------------
 					void AddRichTextInternal(RichText richText)
 					{
 						RichTextTag tag = richText.richTextTag;
@@ -188,7 +187,6 @@ namespace Vertx
 								VisualElement codeContainer = new VisualElement();
 								codeContainer.ClearClassList();
 								codeContainer.AddToClassList("code-container");
-								//the above doesn't seem to be working so we have to set the style manually for now.
 								content.AddToRoot(codeContainer);
 								content.SetCurrentDefaultRoot(codeContainer);
 								
@@ -198,6 +196,7 @@ namespace Vertx
 									AddStyleDefinition = false
 								};
 								string highlit = highlighter.Highlight(richText.associatedText);
+//								Debug.Log(highlit);
 								//Code
 								AddRichText(highlit, root);
 								//Finalise content container
@@ -206,6 +205,8 @@ namespace Vertx
 									if(child.ClassListContains(paragraphContainerClass))
 										child.AddToClassList("code");
 								}
+
+								contentContainer.Query<Label>().Build().ForEach(l=>l.AddToClassList("code"));
 
 								//Reset
 								content.SetCurrentDefaultRoot(lastRoot);
@@ -234,7 +235,6 @@ namespace Vertx
 							results.Add(inlineText);
 						}
 					}
-					//TODO ----------------------------------------------------------------------------------
 				}
 				content.SetCurrentDefaultRoot(rootTemp);
 			}
@@ -304,6 +304,12 @@ namespace Vertx
 		}
 
 		#endregion
+
+		#endregion
+
+		#region Navigation
+
+		public void Home() => content.Home();
 
 		#endregion
 	}

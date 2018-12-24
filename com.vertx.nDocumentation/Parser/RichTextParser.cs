@@ -36,6 +36,7 @@ namespace Vertx
 			{
 				int currentSearchingIndex = currentIndex;
 				//Looking to discover a valid starting delimiter
+				//indexOfOpening is the index of the character after the opening <
 				int indexOfOpening = currentSearchingIndex;
 				bool discoveredValidStartingDelimiter = false;
 				while (!discoveredValidStartingDelimiter)
@@ -85,6 +86,7 @@ namespace Vertx
 				}
 				
 				//Get the location of the starting delimiter if it exists.
+				//search index returned is the index after the start delimiter.
 				Discovery DiscoverValidStartingDelimiter(out int searchIndex, int count = -1)
 				{
 					searchIndex = currentSearchingIndex;
@@ -113,6 +115,7 @@ namespace Vertx
 				#if VERBOSE_DEBUGGING
 				Debug.Log($"<color=green>{GetRichTextCapableText($"<{resultantTag}>")}</color>");
 				#endif
+				bool successfullyParsedTag = true;
 
 				if (currentRichTextTag.tag == Tag.code)
 				{
@@ -126,13 +129,12 @@ namespace Vertx
 					else
 					{
 						//Continue parsing, looking for that closing code tag.
-						currentIndex += 1;
+						currentIndex = indexOfOpening;
 						continue;
 					}
 				}
 				else
 				{
-					bool discovered = true;
 					//Switch through tags that are entire strings
 					switch (resultantTag)
 					{
@@ -197,13 +199,14 @@ namespace Vertx
 							RemoveTag();
 							break;
 						default:
-							discovered = false;
+							successfullyParsedTag = false;
 							break;
 					}
 
 					//StartsWith cannot be in the above switch.
-					if (!discovered)
+					if (!successfullyParsedTag)
 					{
+						successfullyParsedTag = true;
 						if (resultantTag.StartsWith("size")) //START SIZE
 						{
 							if (!GetStringVariables("size", out string stringVariables))
@@ -254,6 +257,10 @@ namespace Vertx
 							AddLastTextWithRichTextTag(currentRichTextTag);
 							currentRichTextTag = currentRichTextTag.GetWithSpan(styleClass);
 						}
+						else
+						{
+							successfullyParsedTag = false;
+						}
 					}
 
 					//Gets the plain string variables following a tag.
@@ -275,6 +282,12 @@ namespace Vertx
 
 				void RemoveTag(bool assignTag = false)
 				{
+					if (previousRichTextTags.Count == 0)
+					{
+						Debug.LogError($"No Tags to Pop! Last added text: {(resultantRichText.Count > 0 ? $"{resultantRichText[resultantRichText.Count-1].richTextTag.ToString()} | {resultantRichText[resultantRichText.Count-1].associatedText}"  : "none")}");
+						return;
+					}
+					
 					if (assignTag)
 						currentRichTextTag = previousRichTextTags.Pop();
 					else
@@ -287,14 +300,13 @@ namespace Vertx
 
 				void AddLastTextWithRichTextTag(RichTextTag tag, bool addTag = true)
 				{
-					if(addTag)
-						AddTag();
-					
+					if (addTag) AddTag();
+
 					//Don't add if no text content to add.
 					if (lastNewTag == indexOfOpening - 1)
 						return;
+					
 					string text = richText.Substring(lastNewTag, (indexOfOpening - 1) - lastNewTag);
-
 					#if VERBOSE_DEBUGGING
 					Debug.Log($"Added Text: \"{text}\".");
 					#endif
@@ -302,8 +314,15 @@ namespace Vertx
 					resultantRichText.Add(new RichText(tag, text));
 				}
 
-				currentIndex = indexOfClosing + 1;
-				lastNewTag = currentIndex;
+				if (successfullyParsedTag)
+				{
+					currentIndex = indexOfClosing + 1;
+					lastNewTag = currentIndex;
+				}
+				else
+				{
+					currentIndex = indexOfOpening;
+				}
 
 				string NotParsedError() => "This text has not been parsed beyond this point.";
 				void RichTextDebug() => Debug.Log(richText);

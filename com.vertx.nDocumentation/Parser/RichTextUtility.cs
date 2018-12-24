@@ -8,5 +8,6 @@ namespace Vertx {
 		public static string GetButtonString(string key, string content) => $"<button={key}>{content}</button>";
 		public static string GetColouredString(string content, Color colour) => $"<color=#{ColorUtility.ToHtmlStringRGBA(colour)}>{content}</color>";
 		public static string GetColoredString(string content, Color color) => GetColouredString(content, color);
+		public static string GetBoldItalicsString(string content) => $"<i><b>{content}</b></i>";
 	}
 }
