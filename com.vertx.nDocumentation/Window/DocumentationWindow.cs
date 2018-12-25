@@ -316,6 +316,15 @@ namespace Vertx
 			return halfSplitter;
 		}
 
+		public VisualElement AddVerticalSpace(float height, VisualElement root = null)
+		{
+			VisualElement verticalSpace = new VisualElement();
+			verticalSpace.AddToClassList("vertical-space");
+			verticalSpace.style.height = height;
+			content.AddToRoot(verticalSpace, root);
+			return verticalSpace;
+		}
+
 		#endregion
 
 		#region Containers

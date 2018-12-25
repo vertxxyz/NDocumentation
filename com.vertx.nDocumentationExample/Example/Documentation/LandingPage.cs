@@ -16,5 +16,13 @@ namespace Vertx.Example
 			window.AddFullWidthButton(typeof(LayoutPage));
 			window.AddRichText("");
 		}
+
+		public static void AddNextButton(DocumentationWindow window, Type pageType)
+		{
+			window.AddVerticalSpace(8);
+			
+			window.AddPlainText("Next:");
+			window.AddFullWidthButton(pageType);
+		}
 	}
 }

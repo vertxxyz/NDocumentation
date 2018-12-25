@@ -41,6 +41,8 @@ namespace Vertx.Example
 			window.AddRichText($"You can optionally extend a {DocumentationPageRootString} with additional content by using a {PageAddition.DocumentationPageAdditionString}. (see {ExtendingPages.ExtendingPagesButton})");
 		}
 
+		public override void DrawDocumentationAfterAdditions(DocumentationWindow window, VisualElement root) => LandingPage.AddNextButton(window, typeof(CreatingPage));
+
 		public static readonly Color CreateColor = new Color(1f, 0.11f, 0.33f);
 		public static readonly string DocumentationWindowString = GetColouredString(nameof(DocumentationWindow), CreateColor);
 		public static readonly string DocumentationPageRootString = GetColouredString(nameof(DocumentationPageRoot), CreateColor);

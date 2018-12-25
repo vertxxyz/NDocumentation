@@ -236,6 +236,8 @@ namespace Vertx
 				foreach (var addition in additionsList)
 					addition.DrawDocumentation(window, root);
 			}
+			
+			page.DrawDocumentationAfterAdditions(window, root);
 
 			//Below buttons
 			if (belowButtonLinks.TryGetValue(page, out var buttonsBelow))

@@ -15,6 +15,8 @@ namespace Vertx.Example
 		{
 			window.AddHeader(Title, 18, FontStyle.Normal);
 		}
+		
+		public override void DrawDocumentationAfterAdditions(DocumentationWindow window, VisualElement root) => LandingPage.AddNextButton(window, typeof(StylingPage));
 
 		public static readonly Color ExtendColor = new Color(1f, 0.87f, 0.32f);
 		public static readonly Color InjectColor = new Color(0.77f, 0.48f, 1f);

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Vertx
 {
@@ -6,5 +7,6 @@ namespace Vertx
     {
         Color Color { get; }
         string Title { get; }
+        void DrawDocumentationAfterAdditions (DocumentationWindow window, VisualElement root);
     }
 }

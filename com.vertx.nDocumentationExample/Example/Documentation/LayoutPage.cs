@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 using static Vertx.DocumentationWindow;
 using static Vertx.Example.WindowPage;
@@ -18,6 +19,7 @@ namespace Vertx.Example
 			window.AddHeader(Title, 18, FontStyle.Normal);
 			window.AddRichText($"All Pages are laid out in the same fashion.\nThere are above and below <i>Button Injection</i> locations, and in between is the <i>Content</i> section. The content section first contains original content provided by the page, then content added by {PageAddition.DocumentationPageAdditionsSpacedString}.");
 
+			// Window
 			VisualElement windowContainer = new Button(()=>window.GoToPage(typeof(WindowPage)));
 			ModifyStyle(windowContainer, CreateColor, 2);
 			root.Add(windowContainer);
@@ -26,7 +28,7 @@ namespace Vertx.Example
 				window.AddRichText(DocumentationWindowString);
 				{ // Above
 					VisualElement buttonInjectionAboveContainer = new VisualElement();
-					ModifyStyle(buttonInjectionAboveContainer, ExtendingPages.InjectColor, 5);
+					ModifyStyle(buttonInjectionAboveContainer, ExtendingPages.InjectColor, 6);
 					windowContainer.Add(buttonInjectionAboveContainer);
 					using (new DefaultRootScope(window, buttonInjectionAboveContainer))
 						window.AddRichText(GetColouredString("Button Links Injected Above", ExtendingPages.InjectColor));
@@ -47,16 +49,28 @@ namespace Vertx.Example
 					using (new DefaultRootScope(window, additionsContainer))
 						window.AddRichText(PageAddition.DocumentationPageAdditionsSpacedString);
 				}
+				
+				{ // After Additions
+					VisualElement contentContainer = new Button(()=>window.GoToPage(typeof(CreatingPage)));
+					ModifyStyle(contentContainer, CreateColor, 2);
+					windowContainer.Add(contentContainer);
+					using (new DefaultRootScope(window, contentContainer))
+						window.AddRichText(GetColouredString("Documentation Content After Additions", CreateColor));
+				}
 
 				{ // Below
 					VisualElement buttonInjectionBelowContainer = new VisualElement();
-					ModifyStyle(buttonInjectionBelowContainer, ExtendingPages.InjectColor, 5);
+					ModifyStyle(buttonInjectionBelowContainer, ExtendingPages.InjectColor, 6);
 					windowContainer.Add(buttonInjectionBelowContainer);
 					using (new DefaultRootScope(window, buttonInjectionBelowContainer))
 						window.AddRichText(GetColouredString("Button Links Injected Below", ExtendingPages.InjectColor));
 				}
+
+				EditorApplication.delayCall += ()=> ModifyStyle(new VisualElement(), Color.white, 0);
 			}
 		}
+
+		public override void DrawDocumentationAfterAdditions(DocumentationWindow window, VisualElement root) => LandingPage.AddNextButton(window, typeof(WindowPage));
 
 		private static void ModifyStyle(VisualElement element, Color borderColor, float borderRadius = 0)
 		{

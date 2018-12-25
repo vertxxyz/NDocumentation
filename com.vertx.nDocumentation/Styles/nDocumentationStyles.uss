@@ -16,7 +16,7 @@
 
 .injected-button-container {
 	padding: 0;
-	margin: 5px 0 0 0;
+	margin: 5px 0 2px 0;
 	align-self : stretch;
 }
 
@@ -127,6 +127,11 @@ Button {
 
 .splitter.inverse {
 	background-color : #1E1E1E;
+}
+
+.vertical-space {
+	align-self: stretch;
+	background-color: transparent;
 }
 
 /* CODE */
