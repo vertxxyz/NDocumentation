@@ -4,7 +4,7 @@ using Vertx.Example;
 
 namespace Vertx
 {
-	public class StylingPage : DocumentationPage
+	public sealed class StylingPage : DocumentationPage
 	{
 		public override ButtonInjection[] InjectButtonLinkAbove => null;
 		public override ButtonInjection[] InjectButtonLinkBelow => new[] {new ButtonInjection(typeof(LandingPage), 4)};

@@ -24,6 +24,10 @@ namespace Vertx
 			content.InitialiseContent();
 		}
 
+		/// <summary>
+		/// Constant Header is an always-drawn header section for all pages.
+		/// </summary>
+		/// <param name="root">Root Element to append to.</param>
 		public virtual void DrawConstantHeader(VisualElement root) { }
 
 		#region Initialise Content
@@ -67,6 +71,14 @@ namespace Vertx
 			return AddFullWidthButton(text, textColor, action, root);
 		}
 
+		public Button AddFullWidthButton(Type pageType, VisualElement root = null)
+		{
+			string registeredAction = pageType.FullName;
+			if (!content.GetRegisteredButtonAction(registeredAction, out var action))
+				return null;
+			return AddFullWidthButton(content.GetTitleFromPage(pageType), content.GetColorFromPage(pageType), action, root);
+		}
+
 		#endregion
 
 		#region Text
@@ -75,18 +87,20 @@ namespace Vertx
 		{
 			Label plainText = new Label
 			{
-				text = text //plain text automatically supports paragraphs.
+				text = text, //plain text automatically supports paragraphs.
+				pickingMode = PickingMode.Ignore
 			};
 			plainText.AddToClassList("plain-text");
 			content.AddToRoot(plainText, root);
 			return plainText;
 		}
-		
+
 		public Label AddInlineText(string text, VisualElement root = null)
 		{
 			Label inlineText = new Label
 			{
-				text = text
+				text = text,
+				pickingMode = PickingMode.Ignore
 			};
 			inlineText.AddToClassList("inline-text");
 			content.AddToRoot(inlineText, root);
@@ -95,7 +109,6 @@ namespace Vertx
 
 		public List<VisualElement> AddRichText(string text, VisualElement root = null)
 		{
-
 			VisualElement rootTemp = content.GetRoot(null);
 			List<VisualElement> results = new List<VisualElement>();
 			IEnumerable<RichText> richTexts = ParseRichText(text);
@@ -108,6 +121,7 @@ namespace Vertx
 					paragraphs[paragraphs.Count - 1].Add(richText);
 					continue;
 				}
+
 				string[] strings = richText.associatedText.Split('\n');
 				for (int i = 0; i < strings.Length; i++)
 				{
@@ -117,15 +131,14 @@ namespace Vertx
 					string[] wordSplit = Regex.Split(strings[i], @"(?<=[ -])"); //Split but keep delimiters attached.
 					foreach (var word in wordSplit)
 					{
-						if(!string.IsNullOrEmpty(word))
+						if (!string.IsNullOrEmpty(word))
 							paragraphs[paragraphs.Count - 1].Add(new RichText(richText.richTextTag, word));
 					}
 				}
 			}
-			
+
 			foreach (List<RichText> paragraph in paragraphs)
 			{
-				
 				//Add all the paragraphs
 				content.SetCurrentDefaultRoot(AddParagraphContainer(root));
 				for (int i = 0; i < paragraph.Count; i++)
@@ -139,7 +152,10 @@ namespace Vertx
 						if (Regex.IsMatch(nextText, "^[^a-zA-Z] ?"))
 						{
 							VisualElement lastRoot = content.GetRoot(null);
-							VisualElement inlineGroup = new VisualElement();
+							VisualElement inlineGroup = new VisualElement
+							{
+								pickingMode = PickingMode.Ignore
+							};
 							content.AddToRoot(inlineGroup, lastRoot);
 							inlineGroup.AddToClassList("inline-text-group");
 							content.SetCurrentDefaultRoot(inlineGroup);
@@ -150,6 +166,7 @@ namespace Vertx
 							continue;
 						}
 					}
+
 					AddRichTextInternal(word);
 
 					//Add all the words and style them.
@@ -178,18 +195,26 @@ namespace Vertx
 								content.AddToRoot(codeCopyButtonButtonContainer);
 								content.SetCurrentDefaultRoot(codeCopyButtonButtonContainer);
 								//Scroll
-								ScrollView codeScroll = new ScrollView(ScrollViewMode.Horizontal);
+								ScrollView codeScroll = new ScrollView(ScrollViewMode.Horizontal)
+								{
+									pickingMode = PickingMode.Ignore
+								};
+								codeScroll.contentViewport.pickingMode = PickingMode.Ignore;
 								VisualElement contentContainer = codeScroll.contentContainer;
+								contentContainer.pickingMode = PickingMode.Ignore;
 								codeScroll.AddToClassList("code-scroll");
 								content.AddToRoot(codeScroll);
 								content.SetCurrentDefaultRoot(contentContainer);
 								
-								VisualElement codeContainer = new VisualElement();
+								VisualElement codeContainer = new VisualElement
+								{
+									pickingMode = PickingMode.Ignore
+								};
 								codeContainer.ClearClassList();
 								codeContainer.AddToClassList("code-container");
 								content.AddToRoot(codeContainer);
 								content.SetCurrentDefaultRoot(codeContainer);
-								
+
 								//Once closing the code tag we should 
 								CsharpHighlighter highlighter = new CsharpHighlighter
 								{
@@ -202,11 +227,11 @@ namespace Vertx
 								//Finalise content container
 								foreach (VisualElement child in codeContainer.Children())
 								{
-									if(child.ClassListContains(paragraphContainerClass))
+									if (child.ClassListContains(paragraphContainerClass))
 										child.AddToClassList("code");
 								}
 
-								contentContainer.Query<Label>().Build().ForEach(l=>l.AddToClassList("code"));
+								contentContainer.Query<Label>().Build().ForEach(l => l.AddToClassList("code"));
 
 								//Reset
 								content.SetCurrentDefaultRoot(lastRoot);
@@ -214,7 +239,8 @@ namespace Vertx
 							case RichTextTag.Tag.span:
 								Label spanLabel = new Label
 								{
-									text = richText.associatedText
+									text = richText.associatedText,
+									pickingMode = PickingMode.Ignore
 								};
 								spanLabel.AddToClassList(tag.stringVariables);
 								content.AddToRoot(spanLabel, root);
@@ -236,13 +262,14 @@ namespace Vertx
 						}
 					}
 				}
+
 				content.SetCurrentDefaultRoot(rootTemp);
 			}
 
 			content.SetCurrentDefaultRoot(rootTemp);
 			return results;
 		}
-		
+
 		public Label AddHeader(string text, int fontSizeOverride = 0, FontStyle fontStyleOverride = FontStyle.Bold, VisualElement root = null)
 		{
 			Label header = AddPlainText(text, root);
@@ -281,7 +308,7 @@ namespace Vertx
 		{
 			VisualElement halfSplitter = new VisualElement();
 			halfSplitter.AddToClassList("splitter");
-			if(halfSize)
+			if (halfSize)
 				halfSplitter.AddToClassList("half");
 			if (inverseColor)
 				halfSplitter.AddToClassList("inverse");
@@ -297,7 +324,10 @@ namespace Vertx
 
 		private VisualElement AddParagraphContainer(VisualElement root = null)
 		{
-			VisualElement paragraphContainer = new VisualElement();
+			VisualElement paragraphContainer = new VisualElement
+			{
+				pickingMode = PickingMode.Ignore
+			};
 			paragraphContainer.AddToClassList(paragraphContainerClass);
 			content.AddToRoot(paragraphContainer, root);
 			return paragraphContainer;
@@ -307,9 +337,35 @@ namespace Vertx
 
 		#endregion
 
+		#region Helpers
+
+		public void SetDefaultRoot(VisualElement root) => content.SetCurrentDefaultRoot(root);
+		public VisualElement GetDefaultRoot() => content.GetRoot(null);
+
+		public sealed class DefaultRootScope : IDisposable
+		{
+			private readonly VisualElement lastRoot;
+			private readonly DocumentationWindow window;
+
+			public DefaultRootScope(DocumentationWindow window, VisualElement rootOverride)
+			{
+				this.window = window;
+				lastRoot = window.content.GetRoot(null);
+				window.content.SetCurrentDefaultRoot(rootOverride);
+			}
+
+			public void Dispose() => window.content.SetCurrentDefaultRoot(lastRoot);
+		}
+
+		#endregion
+
 		#region Navigation
 
 		public void Home() => content.Home();
+
+		public void GoToPage(Type pageType) => content.GoToPage(pageType.FullName);
+
+		public void GoToPage(string pageType) => content.GoToPage(pageType);
 
 		#endregion
 	}

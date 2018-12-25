@@ -1,10 +1,11 @@
 ﻿using System;
+using UnityEditor;
 using UnityEngine.UIElements;
 using static Vertx.RichTextUtility;
 
 namespace Vertx.Example
 {
-	public class PageAddition : DocumentationPageAddition
+	public sealed class PageAddition : DocumentationPageAddition
 	{
 		public override Type PageToAddToType => typeof(ExtendingPages);
 		public override float Order => 0;
@@ -26,5 +27,6 @@ namespace Vertx.Example
 		}
 
 		public static readonly string DocumentationPageAdditionString = GetColouredString(nameof(DocumentationPageAddition), ExtendingPages.ExtendColor);
+		public static readonly string DocumentationPageAdditionsSpacedString = GetColouredString(ObjectNames.NicifyVariableName($"{nameof(DocumentationPageAddition)}s"), ExtendingPages.ExtendColor);
 	}
 }

@@ -355,6 +355,13 @@ namespace Vertx
 		}
 
 		#endregion
+		
+		#region Helpers 
+
+		public string GetTitleFromPage(Type pageType) => pages[pageType.FullName].Title;
+		public Color GetColorFromPage(Type pageType) => pages[pageType.FullName].Color;
+
+		#endregion
 
 
 		#region Textures

@@ -6,7 +6,7 @@ using static Vertx.RichTextUtility;
 
 namespace Vertx.Example
 {
-    public class CreatingPage : DocumentationPage
+    public sealed class CreatingPage : DocumentationPage
     {
         public override ButtonInjection[] InjectButtonLinkAbove => null;
         public override ButtonInjection[] InjectButtonLinkBelow => new []{new ButtonInjection(typeof(LandingPage), 0)};
