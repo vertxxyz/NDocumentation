@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define IGNORE_PICKING
+
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEditor;
@@ -88,7 +90,9 @@ namespace Vertx
 			Label plainText = new Label
 			{
 				text = text, //plain text automatically supports paragraphs.
+				#if IGNORE_PICKING
 				pickingMode = PickingMode.Ignore
+				#endif
 			};
 			plainText.AddToClassList("plain-text");
 			content.AddToRoot(plainText, root);
@@ -100,7 +104,9 @@ namespace Vertx
 			Label inlineText = new Label
 			{
 				text = text,
+				#if IGNORE_PICKING
 				pickingMode = PickingMode.Ignore
+				#endif
 			};
 			inlineText.AddToClassList("inline-text");
 			content.AddToRoot(inlineText, root);
@@ -154,7 +160,9 @@ namespace Vertx
 							VisualElement lastRoot = content.GetRoot(null);
 							VisualElement inlineGroup = new VisualElement
 							{
+								#if IGNORE_PICKING
 								pickingMode = PickingMode.Ignore
+								#endif
 							};
 							content.AddToRoot(inlineGroup, lastRoot);
 							inlineGroup.AddToClassList("inline-text-group");
@@ -197,18 +205,24 @@ namespace Vertx
 								//Scroll
 								ScrollView codeScroll = new ScrollView(ScrollViewMode.Horizontal)
 								{
+									#if IGNORE_PICKING
 									pickingMode = PickingMode.Ignore
+									#endif
 								};
-								codeScroll.contentViewport.pickingMode = PickingMode.Ignore;
 								VisualElement contentContainer = codeScroll.contentContainer;
+								#if IGNORE_PICKING
+								codeScroll.contentViewport.pickingMode = PickingMode.Ignore;
 								contentContainer.pickingMode = PickingMode.Ignore;
+								#endif
 								codeScroll.AddToClassList("code-scroll");
 								content.AddToRoot(codeScroll);
 								content.SetCurrentDefaultRoot(contentContainer);
 								
 								VisualElement codeContainer = new VisualElement
 								{
+									#if IGNORE_PICKING
 									pickingMode = PickingMode.Ignore
+									#endif
 								};
 								codeContainer.ClearClassList();
 								codeContainer.AddToClassList("code-container");
@@ -240,7 +254,9 @@ namespace Vertx
 								Label spanLabel = new Label
 								{
 									text = richText.associatedText,
+									#if IGNORE_PICKING
 									pickingMode = PickingMode.Ignore
+									#endif
 								};
 								spanLabel.AddToClassList(tag.stringVariables);
 								content.AddToRoot(spanLabel, root);
@@ -335,7 +351,9 @@ namespace Vertx
 		{
 			VisualElement paragraphContainer = new VisualElement
 			{
+				#if IGNORE_PICKING
 				pickingMode = PickingMode.Ignore
+				#endif
 			};
 			paragraphContainer.AddToClassList(paragraphContainerClass);
 			content.AddToRoot(paragraphContainer, root);
