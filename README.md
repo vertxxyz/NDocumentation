@@ -1,5 +1,6 @@
 # nDocumentation
-A documentation window for Unity Editor that displays rich text pages.
+An extensible documentation window for the Unity Editor that displays rich text pages.
+**Minimum Currently Supported Version : Unity 2019**
 
 ## Usage
 
