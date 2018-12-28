@@ -7,7 +7,7 @@ using static Vertx.RichTextParser.RichTextTag;
 
 namespace Vertx
 {
-	public static class RichTextParser
+	internal static class RichTextParser
 	{
 		private static readonly string[] acceptedTags = {"b", "i", "color", "colour", "size", "button", "code", "span", "img"};
 		private const char openingTagDelimiter = '<';

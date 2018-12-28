@@ -8,7 +8,7 @@ using static Vertx.DocumentationUtility;
 
 namespace Vertx
 {
-	internal class DocumentationContent
+	internal class DocumentationContent : IButtonRegistry
 	{
 		//The editor prefs key for the state of this DocumentationContent.
 		private readonly string stateEditorPrefsKey;
@@ -17,7 +17,12 @@ namespace Vertx
 		//The default root is set as pages are added as to provide an easy way for content to be added without providing the root to functions constantly.
 		private static VisualElement _currentDefaultRoot;
 		public void SetCurrentDefaultRoot(VisualElement root) => _currentDefaultRoot = root;
-		public VisualElement GetRoot(VisualElement root) => root ?? _currentDefaultRoot;
+		/// <summary>
+		/// Returns the root if provided, otherwise returns the default root.
+		/// </summary>
+		/// <param name="root">Optional root to provide.,</param>
+		/// <returns></returns>
+		public VisualElement GetRoot(VisualElement root = null) => root ?? _currentDefaultRoot;
 
 		/// <summary>
 		/// Adds a VisualElement to a root (default root if null is provided)
@@ -28,7 +33,7 @@ namespace Vertx
 
 		private DocumentationPageRoot pageRoot;
 		private VisualElement windowRoot;
-		private VisualElement contentRoot;
+		private readonly VisualElement contentRoot;
 
 		private readonly DocumentationWindow window;
 
