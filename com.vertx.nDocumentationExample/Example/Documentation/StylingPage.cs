@@ -15,7 +15,7 @@ namespace Vertx
 		{
 			window.AddHeader(Title, 18, FontStyle.Normal);
 			window.AddRichText("Styling pages can be achieved with: <b>buttons</b>, <b>colours</b>, <b>sizes</b>, <b>images</b>, <b>code</b>, and <b>styles</b>.");
-         		}
+		}
 
 		public static readonly Color StylingColor = new Color(0.1f, 1, 0.25f);
 	}

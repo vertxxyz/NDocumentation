@@ -1,12 +1,9 @@
 ﻿//#define IGNORE_PICKING
-
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using static Vertx.RichTextParser;
 
 namespace Vertx
 {
@@ -101,14 +98,20 @@ namespace Vertx
 
 		public List<VisualElement> AddRichText(string text, VisualElement root = null) => RichTextUtility.AddRichText(text, content, content.GetRoot(root));
 
-		public Label AddHeader(string text, int fontSizeOverride = 0, FontStyle fontStyleOverride = FontStyle.Bold, VisualElement root = null)
+		public List<VisualElement> AddHeader(string text, int fontSizeOverride = 0, FontStyle fontStyleOverride = FontStyle.Bold, VisualElement root = null)
 		{
-			Label header = AddPlainText(text, root);
-			header.AddToClassList("header");
-			if (fontStyleOverride != FontStyle.Bold)
-				header.style.unityFontStyleAndWeight = fontStyleOverride;
-			if (fontSizeOverride > 0)
-				header.style.fontSize = fontSizeOverride;
+			List<VisualElement> header = AddRichText(text, root);
+			foreach (VisualElement h in header)
+			{
+				Label l = h as Label;
+				if (l == null) continue;
+				l.AddToClassList("header");
+				if (fontStyleOverride != FontStyle.Bold)
+					l.style.unityFontStyleAndWeight = fontStyleOverride;
+				if (fontSizeOverride > 0)
+					l.style.fontSize = fontSizeOverride;
+			}
+			
 			AddSplitter(true, false, root);
 			return header;
 		}

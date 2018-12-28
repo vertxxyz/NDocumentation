@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Vertx
 {
-	public class CsharpHighlighter
+	public class CSharpHighlighter
 	{
 		private string _commentCssClass;
 		private string _keywordCssClass;
@@ -76,9 +76,9 @@ namespace Vertx
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="CsharpHighlighter"/> class.
+		/// Initializes a new instance of the <see cref="CSharpHighlighter"/> class.
 		/// </summary>
-		public CsharpHighlighter()
+		public CSharpHighlighter()
 		{
 			_addStyleDefinition = true;
 			_commentCssClass = "comment";
@@ -236,7 +236,7 @@ namespace Vertx
 
 			List<string> highlightedClasses = new List<string>();
 			//Highlight types based on the logic <ClassName>
-			regex = new Regex(@"(?<=<)([A-Z]\w+)(?=>)");
+			regex = new Regex(@"(?<=<)([A-Z]\w*)(?=>)");
 			content = regex.ReplaceWithCSS(content, TypeCssClass);
 
 			// Highlight class names based on the logic: "{space OR start of line OR >}{1 capital){alphanumeric} " - must not be followed by an =
