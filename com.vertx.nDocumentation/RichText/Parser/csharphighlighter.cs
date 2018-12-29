@@ -12,6 +12,7 @@ namespace Vertx
 		private string _keywordCssClass;
 		private string _quotesCssClass;
 		private string _typeCssClass;
+		private string _numberCssClass;
 		private bool _addStyleDefinition;
 		private readonly HashSet<string> _keywords;
 		private bool _addPreTags;
@@ -56,6 +57,15 @@ namespace Vertx
 			get => _typeCssClass;
 			set => _typeCssClass = value;
 		}
+		
+		/// <summary>
+		/// Gets or sets the CSS class used for numerical values. The default is 'number'.
+		/// </summary>
+		public string NumberCssClass
+		{
+			get => _numberCssClass;
+			set => _numberCssClass = value;
+		}
 
 		/// <summary>
 		/// Whether to add the CSS style definition to the top of the highlighted code.
@@ -85,6 +95,7 @@ namespace Vertx
 			_keywordCssClass = "keyword";
 			_quotesCssClass = "quotes";
 			_typeCssClass = "type";
+			_numberCssClass = "number";
 			_keywords = new HashSet<string>()
 			{
 				"static", "using", "true", "false", "new",
@@ -290,6 +301,10 @@ namespace Vertx
 
 			// Highlight typeof
 			content = content.Replace("typeof(", "<span class=\"keyword\">typeof</span>(");
+			
+			// Highlight numerical values
+			regex = new Regex(@"(?<!\w)([0-9]+)(?!\w)", RegexOptions.Singleline);
+			content = regex.ReplaceWithCSS(content, NumberCssClass);
 
 			// Shove the multiline comments back in
 			for (int i = 0; i < multiLineComments.Count; i++)

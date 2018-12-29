@@ -234,8 +234,8 @@ namespace Vertx
 
 			return results;
 			
-			void RichTextDebug(string richText) => Debug.Log(GetRichTextCapableText(richText));
-			string GetRichTextCapableText(string richText) => text.Replace("<", "<<b></b>");
+			/*void RichTextDebug(string richText) => Debug.Log(GetRichTextCapableText(richText));
+			string GetRichTextCapableText(string richText) => text.Replace("<", "<<b></b>");*/
 		}
 		
 		

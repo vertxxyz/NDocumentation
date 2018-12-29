@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 namespace Vertx.Example
 {
-	public class OtherStylesPage : DocumentationPageAddition
+	public class MethodStylesPage : DocumentationPageAddition
 	{
 		public override Type PageToAddToType => typeof(StylingPage);
 		public override float Order => 1;
