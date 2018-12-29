@@ -82,6 +82,12 @@ namespace Vertx
 
 		#region Text
 
+		/// <summary>
+		/// Adds a plain text paragraph
+		/// </summary>
+		/// <param name="text">The text to plainly display as a paragraph.</param>
+		/// <param name="root">Root, current default if left null</param>
+		/// <returns>The Label representing the paragraph of text</returns>
 		public Label AddPlainText(string text, VisualElement root = null)
 		{
 			Label plainText = new Label
@@ -96,15 +102,28 @@ namespace Vertx
 			return plainText;
 		}
 
+		/// <summary>
+		/// Adds VisualElements corresponding to the provided rich text to a root.
+		/// </summary>
+		/// <param name="text">The rich text to parse</param>
+		/// <param name="root">Visual Element to append the rich text UI to, current default if left null</param>
+		/// <returns>A list of all immediate children added to the root.</returns>
 		public List<VisualElement> AddRichText(string text, VisualElement root = null) => RichTextUtility.AddRichText(text, content, content.GetRoot(root));
 
+		/// <summary>
+		/// Adds a header (including a half splitter for separation)
+		/// </summary>
+		/// <param name="text">text to display on the header Label (supports Rich Text)</param>
+		/// <param name="fontSizeOverride">Font size override.</param>
+		/// <param name="fontStyleOverride">Font style override.</param>
+		/// <param name="root">Visual Element to append the header to, current default if left null</param>
+		/// <returns>A list of all immediate children added to the root.</returns>
 		public List<VisualElement> AddHeader(string text, int fontSizeOverride = 0, FontStyle fontStyleOverride = FontStyle.Bold, VisualElement root = null)
 		{
 			List<VisualElement> header = AddRichText(text, root);
 			foreach (VisualElement h in header)
 			{
-				Label l = h as Label;
-				if (l == null) continue;
+				if (!(h is Label l)) continue;
 				l.AddToClassList("header");
 				if (fontStyleOverride != FontStyle.Bold)
 					l.style.unityFontStyleAndWeight = fontStyleOverride;
@@ -112,7 +131,7 @@ namespace Vertx
 					l.style.fontSize = fontSizeOverride;
 			}
 			
-			AddSplitter(true, false, root);
+			header.Add(AddSplitter(true, false, root));
 			return header;
 		}
 
@@ -120,6 +139,13 @@ namespace Vertx
 
 		#region Splitters
 
+		/// <summary>
+		/// Adds a splitter (a horizontal break line)
+		/// </summary>
+		/// <param name="halfSize">A fixed-width small version of the splitter</param>
+		/// <param name="inverseColor">Whether to inverse the colour scheme</param>
+		/// <param name="root">Root, current default if left null</param>
+		/// <returns>The splitter element</returns>
 		public VisualElement AddSplitter(bool halfSize = false, bool inverseColor = false, VisualElement root = null)
 		{
 			VisualElement halfSplitter = new VisualElement();
@@ -132,6 +158,12 @@ namespace Vertx
 			return halfSplitter;
 		}
 
+		/// <summary>
+		/// Adds blank vertical space.
+		/// </summary>
+		/// <param name="height">Height of the vertical space</param>
+		/// <param name="root">Root, current default if left null</param>
+		/// <returns>The vertical space element</returns>
 		public VisualElement AddVerticalSpace(float height, VisualElement root = null)
 		{
 			VisualElement verticalSpace = new VisualElement();

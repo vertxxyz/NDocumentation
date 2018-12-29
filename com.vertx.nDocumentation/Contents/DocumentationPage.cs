@@ -4,6 +4,10 @@ using UnityEngine.UIElements;
 
 namespace Vertx
 {
+	/// <summary>
+	/// Inheriting from Documentation Page creates Page content that's linkable in a DocumentationWindow.
+	/// Links to this Page can also be injected into other pages.
+	/// </summary>
 	public abstract class DocumentationPage : IDocumentationPage
 	{
 		#region Button Links
@@ -42,9 +46,10 @@ namespace Vertx
 			public DocumentationPage pageOfOrigin;
 		}
 		#endregion
+		
 		public abstract Color Color { get; }
 		public abstract string Title { get; }
-
+		
 		public abstract void DrawDocumentation(DocumentationWindow window, VisualElement root);
 		public virtual void DrawDocumentationAfterAdditions(DocumentationWindow window, VisualElement root) { }
 		public virtual void Initialise(DocumentationWindow window) { }

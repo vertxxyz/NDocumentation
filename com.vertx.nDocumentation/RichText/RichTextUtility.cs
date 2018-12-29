@@ -38,9 +38,16 @@ namespace Vertx
 		public static string GetColoredString(string content, Color color) => GetColouredString(content, color);
 		public static string GetBoldItalicsString(string content) => $"<i><b>{content}</b></i>";
 
+		/// <summary>
+		/// Adds VisualElements corresponding to the provided rich text to a root.
+		/// </summary>
+		/// <param name="text">The rich text to parse</param>
+		/// <param name="buttonRegistry">A registry that can be queried for keys if there are any button tags.</param>
+		/// <param name="root">Visual Element to append the rich text UI to.</param>
+		/// <returns>A list of all immediate children added to the root.</returns>
 		public static List<VisualElement> AddRichText(string text, IButtonRegistry buttonRegistry, VisualElement root) => AddRichText(text, buttonRegistry, root, false);
 
-		public static List<VisualElement> AddRichText(string text, IButtonRegistry buttonRegistry, VisualElement root, bool isInsideCodeBlock)
+		private static List<VisualElement> AddRichText(string text, IButtonRegistry buttonRegistry, VisualElement root, bool isInsideCodeBlock)
 		{
 			List<VisualElement> results = new List<VisualElement>();
 			IEnumerable<RichText> richTexts = ParseRichText(text, isInsideCodeBlock);
@@ -112,6 +119,12 @@ namespace Vertx
 								inlineText = AddInlineText(richText.associatedText, rootToAddTo);
 								break;
 							case RichTextTag.Tag.button:
+								if (buttonRegistry == null)
+								{
+									Debug.LogWarning("There was no ButtonRegistry provided to AddRichText. Button tags will not function.");
+									inlineText = AddInlineButton(() => Debug.LogWarning("There was no ButtonRegistry provided to AddRichText. Button tags will not function."), richText.associatedText, rootToAddTo);
+									break;
+								}
 								if (!buttonRegistry.GetRegisteredButtonAction(tag.stringVariables, out Action action))
 									return;
 								inlineText = AddInlineButton(action, richText.associatedText, rootToAddTo);
@@ -143,16 +156,10 @@ namespace Vertx
 								codeScroll.AddToClassList("code-scroll");
 								codeCopyButtonButtonContainer.Add(codeScroll);
 
-								VisualElement codeContainer = new VisualElement
-								{
-									#if IGNORE_PICKING
-									pickingMode = PickingMode.Ignore
-									#endif
-								};
-								codeContainer.ClearClassList();
-								codeContainer.AddToClassList("code-container");
-								contentContainer.Add(codeContainer);
-
+								contentContainer.ClearClassList();
+								contentContainer.AddToClassList("code-container");
+								VisualElement codeContainer = contentContainer;
+								
 								CSharpHighlighter highlighter = new CSharpHighlighter
 								{
 									AddStyleDefinition = false
@@ -241,7 +248,12 @@ namespace Vertx
 		
 
 		#region Inline
-		
+		/// <summary>
+		/// Adds a Label that displays inline with other inline content.
+		/// </summary>
+		/// <param name="text">Text displayed on the Label</param>
+		/// <param name="root">Root to append the Label to</param>
+		/// <returns>The inline Label</returns>
 		public static Label AddInlineText(string text, VisualElement root)
 		{
 			Label inlineText = new Label
@@ -256,6 +268,13 @@ namespace Vertx
 			return inlineText;
 		}
 		
+		/// <summary>
+		/// Adds a Button that displays inline with other inline content.
+		/// </summary>
+		/// <param name="action">Action to perform when the button is pressed</param>
+		/// <param name="text">Text to display on the Button</param>
+		/// <param name="root">Root to append the Button to</param>
+		/// <returns>The inline Button</returns>
 		public static Button AddInlineButton(Action action, string text, VisualElement root)
 		{
 			Button inlineButton = new Button(action)

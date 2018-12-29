@@ -10,10 +10,13 @@ namespace Vertx.Example
 		public override void DrawDocumentation(DocumentationWindow window, VisualElement root)
 		{
 			window.AddHeader("nDocumentation");
+			window.AddVerticalSpace(5);
 			window.AddPlainText("NDocumentation provides an extensible Unity documentation window solution with inline buttons and styling.");
+			window.AddVerticalSpace(5);
 			window.AddSplitter();
 			window.AddRichText("To learn about creating pages first you must learn:");
 			window.AddFullWidthButton(typeof(LayoutPage));
+			window.AddVerticalSpace(5);
 			window.AddRichText("");
 		}
 
