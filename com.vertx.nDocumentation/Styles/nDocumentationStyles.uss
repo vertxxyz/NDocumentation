@@ -134,8 +134,7 @@ Button {
 
 /* CODE */
 
-.code-button-container {
-	background-image: none;
+.code-scroll {
 	background-color: #1E1E1E;
 	margin: 2px 0px 5px 0px;
 	padding: 0;
@@ -143,13 +142,22 @@ Button {
 	border-top-left-radius: 6px;
 	border-top-right-radius: 6px;
 	border-color: #a66a54;
-	cursor: link;
 	/*min-width: 200px;*/
+}
+
+.code-button {
+	background-image: none;
+	background-color: transparent;
+	padding: 0;
+	margin: 0;
+	position: absolute;
+	cursor: link;
 }
 
 .code-container {
 	margin-top: 2px;
 	margin-bottom: 6px;
+	padding-top: 3px;
 	-unity-font: resource("consola");
 	font-size: 12px;
 	flex-direction: column;

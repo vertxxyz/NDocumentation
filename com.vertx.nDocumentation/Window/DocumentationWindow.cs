@@ -1,5 +1,4 @@
-﻿//#define IGNORE_PICKING
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -7,6 +6,11 @@ using UnityEngine.UIElements;
 
 namespace Vertx
 {
+	/// <summary>
+	/// An EditorWindow to be used with:
+	/// DocumentationPageRoot, DocumentationPage, and DocumentationPageAddition.
+	/// This window provides functions for adding rich text to these pages, whilst also being a platform for consistent layout.
+	/// </summary>
 	public abstract class DocumentationWindow : EditorWindow
 	{
 		/// <summary>
@@ -92,10 +96,7 @@ namespace Vertx
 		{
 			Label plainText = new Label
 			{
-				text = text, //plain text automatically supports paragraphs.
-				#if IGNORE_PICKING
-				pickingMode = PickingMode.Ignore
-				#endif
+				text = text //plain text automatically supports paragraphs.
 			};
 			plainText.AddToClassList("plain-text");
 			content.AddToRoot(plainText, root);

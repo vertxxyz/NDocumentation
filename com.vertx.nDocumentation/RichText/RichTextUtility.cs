@@ -1,5 +1,4 @@
-﻿//#define IGNORE_PICKING
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -91,12 +90,7 @@ namespace Vertx
 						string nextText = nextWord.associatedText;
 						if (Regex.IsMatch(nextText, "^[^a-zA-Z] ?"))
 						{
-							VisualElement inlineGroup = new VisualElement
-							{
-								#if IGNORE_PICKING
-								pickingMode = PickingMode.Ignore
-								#endif
-							};
+							VisualElement inlineGroup = new VisualElement();
 							root.Add(inlineGroup);
 							inlineGroup.AddToClassList("inline-text-group");
 							AddRichTextInternal(word, inlineGroup);
@@ -130,31 +124,13 @@ namespace Vertx
 								inlineText = AddInlineButton(action, richText.associatedText, rootToAddTo);
 								break;
 							case RichTextTag.Tag.code:
-								//Button
-								Button codeCopyButtonButtonContainer = new Button(() =>
-								{
-									EditorGUIUtility.systemCopyBuffer = richText.associatedText;
-									Debug.Log("Copied Code to Clipboard");
-								});
-								codeCopyButtonButtonContainer.ClearClassList();
-								codeCopyButtonButtonContainer.AddToClassList("code-button-container");
-								root.Add(codeCopyButtonButtonContainer);
 								//Scroll
-								ScrollView codeScroll = new ScrollView(ScrollViewMode.Horizontal)
-								{
-									#if IGNORE_PICKING
-									pickingMode = PickingMode.Ignore
-									#endif
-								};
+								ScrollView codeScroll = new ScrollView(ScrollViewMode.Horizontal);
 								VisualElement contentContainer = codeScroll.contentContainer;
 								codeScroll.contentViewport.style.flexDirection = FlexDirection.Column;
 								codeScroll.contentViewport.style.alignItems = Align.Stretch;
-								#if IGNORE_PICKING
-								codeScroll.contentViewport.pickingMode = PickingMode.Ignore;
-								contentContainer.pickingMode = PickingMode.Ignore;
-								#endif
 								codeScroll.AddToClassList("code-scroll");
-								codeCopyButtonButtonContainer.Add(codeScroll);
+								root.Add(codeScroll);
 
 								contentContainer.ClearClassList();
 								contentContainer.AddToClassList("code-container");
@@ -183,6 +159,8 @@ namespace Vertx
 								
 								//Begin Hack
 								FieldInfo m_inheritedStyle = typeof(VisualElement).GetField("inheritedStyle", BindingFlags.NonPublic | BindingFlags.Instance);
+								if (m_inheritedStyle == null)
+									m_inheritedStyle = typeof(VisualElement).GetField("m_InheritedStylesData", BindingFlags.NonPublic | BindingFlags.Instance);
 								Type inheritedStylesData = Type.GetType("UnityEngine.UIElements.StyleSheets.InheritedStylesData,UnityEngine");
 								FieldInfo font = inheritedStylesData.GetField("font", BindingFlags.Public | BindingFlags.Instance);
 								FieldInfo fontSize = inheritedStylesData.GetField("fontSize", BindingFlags.Public | BindingFlags.Instance);
@@ -205,15 +183,23 @@ namespace Vertx
 									l.style.width = measuredTextSize.x;
 									l.style.height = measuredTextSize.y;
 								});
+								
+								//Button
+								Button codeCopyButtonButtonContainer = new Button(() =>
+								{
+									EditorGUIUtility.systemCopyBuffer = richText.associatedText;
+									Debug.Log("Copied Code to Clipboard");
+								});
+								codeCopyButtonButtonContainer.ClearClassList();
+								codeCopyButtonButtonContainer.AddToClassList("code-button");
+								codeCopyButtonButtonContainer.StretchToParentSize();
+								codeContainer.Add(codeCopyButtonButtonContainer);
 
 								break;
 							case RichTextTag.Tag.span:
 								Label spanLabel = new Label
 								{
-									text = richText.associatedText,
-									#if IGNORE_PICKING
-									pickingMode = PickingMode.Ignore
-									#endif
+									text = richText.associatedText
 								};
 								spanLabel.AddToClassList(tag.stringVariables);
 								rootToAddTo.Add(spanLabel);
@@ -258,10 +244,7 @@ namespace Vertx
 		{
 			Label inlineText = new Label
 			{
-				text = text,
-				#if IGNORE_PICKING
-				pickingMode = PickingMode.Ignore
-				#endif
+				text = text
 			};
 			inlineText.AddToClassList("inline-text");
 			root.Add(inlineText);
@@ -295,12 +278,7 @@ namespace Vertx
 
 		private static VisualElement AddParagraphContainer(VisualElement root)
 		{
-			VisualElement paragraphContainer = new VisualElement
-			{
-				#if IGNORE_PICKING
-				pickingMode = PickingMode.Ignore
-				#endif
-			};
+			VisualElement paragraphContainer = new VisualElement();
 			paragraphContainer.AddToClassList(paragraphContainerClass);
 			root.Add(paragraphContainer);
 			return paragraphContainer;
