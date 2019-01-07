@@ -6,7 +6,7 @@ namespace Vertx
 	/// <summary>
 	/// Additional documentation injected into a Documentation Page.
 	/// </summary>
-	public abstract class DocumentationPageAddition : IDocumentation
+	public abstract class DocumentationPageAddition<T> : IDocumentation<T> where T : DocumentationWindow
 	{
 		/// <summary>
 		/// The documentation to inject below.
@@ -18,9 +18,9 @@ namespace Vertx
 		/// </summary>
 		public abstract float Order { get; }
 		
-		public abstract void DrawDocumentation(DocumentationWindow window, VisualElement root);
+		public abstract void DrawDocumentation(T window, VisualElement root);
 		
 		
-		public virtual void Initialise(DocumentationWindow window) { }
+		public virtual void Initialise(T window) { }
 	}
 }

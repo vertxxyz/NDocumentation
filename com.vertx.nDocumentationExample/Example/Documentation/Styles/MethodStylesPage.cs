@@ -4,12 +4,12 @@ using UnityEngine.UIElements;
 
 namespace Vertx.Example
 {
-	public class MethodStylesPage : DocumentationPageAddition
+	public class MethodStylesPage : DocumentationPageAddition<ExampleWindow>
 	{
 		public override Type PageToAddToType => typeof(StylingPage);
 		public override float Order => 1;
 
-		public override void DrawDocumentation(DocumentationWindow window, VisualElement root)
+		public override void DrawDocumentation(ExampleWindow window, VisualElement root)
 		{
 			window.AddVerticalSpace(15);
 			window.AddHeader("Methods", 15);

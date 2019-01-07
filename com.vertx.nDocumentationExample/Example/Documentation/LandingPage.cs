@@ -3,11 +3,9 @@ using UnityEngine.UIElements;
 
 namespace Vertx.Example
 {
-	public sealed class LandingPage : DocumentationPageRoot
+	public sealed class LandingPage : DocumentationPageRoot<ExampleWindow>
 	{
-		public override Type ParentDocumentationWindowType => typeof(ExampleWindow);
-
-		public override void DrawDocumentation(DocumentationWindow window, VisualElement root)
+		public override void DrawDocumentation(ExampleWindow window, VisualElement root)
 		{
 			window.AddHeader("nDocumentation");
 			window.AddVerticalSpace(5);

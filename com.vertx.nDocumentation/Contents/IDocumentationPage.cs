@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 
 namespace Vertx
 {
-    internal interface IDocumentationPage : IDocumentation
+    internal interface IDocumentationPage<in T> : IDocumentation<T> where T : DocumentationWindow
     {
         /// <summary>
         /// The colour of link buttons that reference this page.
@@ -20,6 +20,6 @@ namespace Vertx
         /// </summary>
         /// <param name="window">Parent EditorWindow (contains helper functions)</param>
         /// <param name="root">Visual Element to append UI to.</param>
-        void DrawDocumentationAfterAdditions (DocumentationWindow window, VisualElement root);
+        void DrawDocumentationAfterAdditions (T window, VisualElement root);
     }
 }

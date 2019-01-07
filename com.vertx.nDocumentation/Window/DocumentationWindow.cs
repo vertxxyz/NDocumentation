@@ -19,11 +19,11 @@ namespace Vertx
 		/// <returns>The window key.</returns>
 		protected abstract string StateEditorPrefsKey { get; }
 
-		private DocumentationContent content;
+		private DocumentationContentBase content;
 
-		private void OnEnable()
+		public void InitialiseDocumentationOnRoot<T>(T window, VisualElement root) where T : DocumentationWindow
 		{
-			content = new DocumentationContent(rootVisualElement, this, StateEditorPrefsKey);
+			content = new DocumentationContent<T>(rootVisualElement, window, StateEditorPrefsKey);
 			content.InitialiseContent();
 		}
 

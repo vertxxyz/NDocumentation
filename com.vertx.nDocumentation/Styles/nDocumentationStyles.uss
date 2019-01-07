@@ -34,6 +34,7 @@
 }
 
 .paragraph-container {
+	flex-grow: 1;
 	padding: 0;
 	margin: 2px 5px 5px 16px;
 	flex-wrap: wrap;
@@ -62,6 +63,7 @@ Button {
 .inline-button {
 	-unity-text-align: lower-left;
 	padding: 0;
+	margin-bottom: -1px;
 }
 
 .injected-button:hover {
@@ -135,6 +137,7 @@ Button {
 /* CODE */
 
 .code-scroll {
+	/*flex-grow: 1;*/
 	background-color: #1E1E1E;
 	margin: 2px 0px 5px 0px;
 	padding: 0;

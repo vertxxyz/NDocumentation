@@ -8,7 +8,7 @@ namespace Vertx
 	/// Inheriting from Documentation Page creates Page content that's linkable in a DocumentationWindow.
 	/// Links to this Page can also be injected into other pages.
 	/// </summary>
-	public abstract class DocumentationPage : IDocumentationPage
+	public abstract class DocumentationPage<T> : IDocumentationPage<T> where T : DocumentationWindow
 	{
 		#region Button Links
 		/// <summary>
@@ -43,15 +43,15 @@ namespace Vertx
 			/// <summary>
 			/// Assigned internally.
 			/// </summary>
-			public DocumentationPage pageOfOrigin;
+			public DocumentationPage<T> pageOfOrigin;
 		}
 		#endregion
 		
 		public abstract Color Color { get; }
 		public abstract string Title { get; }
 		
-		public abstract void DrawDocumentation(DocumentationWindow window, VisualElement root);
-		public virtual void DrawDocumentationAfterAdditions(DocumentationWindow window, VisualElement root) { }
-		public virtual void Initialise(DocumentationWindow window) { }
+		public abstract void DrawDocumentation(T window, VisualElement root);
+		public virtual void DrawDocumentationAfterAdditions(T window, VisualElement root) { }
+		public virtual void Initialise(T window) { }
 	}
 }

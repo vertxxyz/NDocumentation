@@ -7,14 +7,14 @@ using static Vertx.RichTextUtility;
 
 namespace Vertx.Example
 {
-	public sealed class LayoutPage : DocumentationPage
+	public sealed class LayoutPage : DocumentationPage<ExampleWindow>
 	{
 		public override ButtonInjection[] InjectButtonLinkAbove => null;
 		public override ButtonInjection[] InjectButtonLinkBelow => null;
 		public override Color Color => LayoutColor;
 		public override string Title => "Page Layout";
 
-		public override void DrawDocumentation(DocumentationWindow window, VisualElement root)
+		public override void DrawDocumentation(ExampleWindow window, VisualElement root)
 		{
 			window.AddHeader(Title, 18, FontStyle.Normal);
 			window.AddRichText($"All Pages are laid out in the same fashion.\nThere are above and below <i>Button Injection</i> locations, and in between is the <i>Content</i> section. The content section first contains original content provided by the page, then content added by {PageAddition.DocumentationPageAdditionsSpacedString}.");
@@ -70,7 +70,7 @@ namespace Vertx.Example
 			}
 		}
 
-		public override void DrawDocumentationAfterAdditions(DocumentationWindow window, VisualElement root) => LandingPage.AddNextButton(window, typeof(WindowPage));
+		public override void DrawDocumentationAfterAdditions(ExampleWindow window, VisualElement root) => LandingPage.AddNextButton(window, typeof(WindowPage));
 
 		private static void ModifyStyle(VisualElement element, Color borderColor, float borderRadius = 0)
 		{

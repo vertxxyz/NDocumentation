@@ -100,10 +100,25 @@ namespace Vertx
 		/// Returns an array of Types inherited from Type T in the Loaded (user & Unity) Assemblies.
 		/// This function also operates with interfaces.
 		/// </summary>
-		private static IEnumerable<Type> GetTypesOfExtensions<T>() => (IEnumerable<Type>) SubclassesOf_Method.Invoke(null, new object[] {typeof(T)});
+		private static IEnumerable<Type> GetTypesOfExtensions<T>() => GetTypesOfExtensions(typeof(T));
+		private static IEnumerable<Type> GetTypesOfExtensions(Type type) => (IEnumerable<Type>) SubclassesOf_Method.Invoke(null, new object[] {type});
 
 		private static MethodInfo _SubclassesOf_Method;
 		private static MethodInfo SubclassesOf_Method => _SubclassesOf_Method ?? (_SubclassesOf_Method = editorAssembliesType.GetMethod("SubclassesOf", BindingFlags.Static | BindingFlags.NonPublic));
+		
+		public static IEnumerable<TBase> GetExtensionsOfTypeIE<TBase>(Type specificType)
+		{
+			IEnumerable<Type> typesOfEditorExtensions = GetTypesOfExtensions(specificType);
+			List<TBase> extensions = new List<TBase>();
+			foreach (Type t in typesOfEditorExtensions)
+			{
+				if (t.IsAbstract)
+					continue;
+				extensions.Add((TBase) Activator.CreateInstance(t));
+			}
+
+			return extensions;
+		}
 
 		public static IEnumerable<T> GetExtensionsOfTypeIE<T>()
 		{

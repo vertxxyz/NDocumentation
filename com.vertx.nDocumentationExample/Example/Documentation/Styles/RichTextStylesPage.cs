@@ -4,12 +4,12 @@ using UnityEngine.UIElements;
 
 namespace Vertx.Example
 {
-	public class RichTextStylesPage : DocumentationPageAddition
+	public class RichTextStylesPage : DocumentationPageAddition<ExampleWindow>
 	{
 		public override Type PageToAddToType => typeof(StylingPage);
 		public override float Order => 0;
 
-		public override void DrawDocumentation(DocumentationWindow window, VisualElement root)
+		public override void DrawDocumentation(ExampleWindow window, VisualElement root)
 		{
 			window.AddVerticalSpace(15);
 			window.AddHeader("Rich Text", 15);
@@ -34,6 +34,6 @@ namespace Vertx.Example
 		}
 		
 		public const string buttonKey = "button_key_example";
-		public override void Initialise(DocumentationWindow window) => window.RegisterButton(buttonKey, ()=> Debug.Log("You can register these buttons in Initialise!"));
+		public override void Initialise(ExampleWindow window) => window.RegisterButton(buttonKey, ()=> Debug.Log("You can register these buttons in Initialise!"));
 	}
 }
