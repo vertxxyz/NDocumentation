@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
-using UnityEngine;
 
 namespace Vertx
 {
@@ -96,7 +95,7 @@ namespace Vertx
 			_quotesCssClass = "quotes";
 			_typeCssClass = "type";
 			_numberCssClass = "number";
-			_keywords = new HashSet<string>()
+			_keywords = new HashSet<string>
 			{
 				"static", "using", "true", "false", "new",
 				"namespace", "void", "private", "public", "protected", "override", "virtual",
@@ -261,7 +260,7 @@ namespace Vertx
 			content = regex.ReplaceWithCSS(content, TypeCssClass);
 
 			// Pass 3. Generics
-			regex = new Regex(@"(?:\s|\[|\()([A-Z]\w+(?:<|&lt;))", RegexOptions.Singleline);
+			regex = new Regex(@"(?::|:\s|\[|\()([A-Z]\w+(?:<|&lt;))", RegexOptions.Singleline);
 			highlightedClasses = new List<string>();
 			if (regex.IsMatch(content))
 			{
@@ -291,6 +290,10 @@ namespace Vertx
 			// Highlight types surrounded by typeof()
 			regex = new Regex($"(?<=typeof{startBracket})([a-zA-Z0-9 ]+)(?={endBracket})");
 			content = regex.ReplaceWithCSS(content, TypeCssClass);
+			
+			// Highlight this keyword
+			regex = new Regex(@"(?<=[\s\(])(this)(?=[\s,])");
+			content = regex.ReplaceWithCSS(content, KeywordCssClass);
 
 			// Highlight keywords
 			foreach (string keyword in _keywords)

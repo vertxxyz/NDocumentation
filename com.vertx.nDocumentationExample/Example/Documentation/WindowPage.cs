@@ -20,13 +20,12 @@ namespace Vertx.Example
 	[MenuItem(""Window/Foo Window"")]
 	static void Open()
 	{
-		FooWindow fooWindow = GetWindow<ExampleWindow>();
+		FooWindow fooWindow = GetWindow<FooWindow>();
 		fooWindow.Show();
 	}
 
 	protected override string StateEditorPrefsKey => ""FooWindow_Prefs_Key"";
 	private void OnEnable() => InitialiseDocumentationOnRoot(this, rootVisualElement);
-
 }</code>");
 
 			window.AddRichText($"Once the {DocumentationWindowString} is created it requires a {DocumentationPageRootString}. This page binds specifically to the target window and is the root for navigating to other documentation.\n{GetBoldItalicsString("Home()")} will navigate directly to this page.");

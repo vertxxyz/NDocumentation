@@ -170,7 +170,7 @@ Button {
 }
 
 .paragraph-container.code {
-	margin: 0px, 5px, 0px, 10px;
+	margin: 1px, 5px, 1px, 10px;
 	flex-wrap: nowrap;
 }
 
