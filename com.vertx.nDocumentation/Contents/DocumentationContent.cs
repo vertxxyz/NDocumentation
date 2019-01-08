@@ -376,7 +376,7 @@ namespace Vertx
 					{
 						stringBuilder.Clear();
 						paragraph.Query<TextElement>().Build().ForEach(tE => stringBuilder.Append(tE.text));
-						searchStrings.Add(stringBuilder.ToString());
+						searchStrings.Add(stringBuilder.ToString().ToLower());
 						paragraph.Clear();
 					});
 					//Get all the text from the Text elements under searchRootTemp
