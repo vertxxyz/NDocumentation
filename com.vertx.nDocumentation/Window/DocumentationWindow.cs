@@ -23,7 +23,7 @@ namespace Vertx
 
 		public void InitialiseDocumentationOnRoot<T>(T window, VisualElement root) where T : DocumentationWindow
 		{
-			content = new DocumentationContent<T>(rootVisualElement, window, StateEditorPrefsKey);
+			content = new DocumentationContent<T>(root, window, StateEditorPrefsKey);
 			content.InitialiseContent();
 		}
 
@@ -181,7 +181,7 @@ namespace Vertx
 		#region Helpers
 
 		public void SetDefaultRoot(VisualElement root) => content.SetCurrentDefaultRoot(root);
-		public VisualElement GetDefaultRoot() => content.GetRoot(null);
+		public VisualElement GetDefaultRoot() => content.GetRoot();
 
 		public sealed class DefaultRootScope : IDisposable
 		{

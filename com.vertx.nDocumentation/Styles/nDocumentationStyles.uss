@@ -42,6 +42,13 @@
 	-unity-text-align: lower-left;
 }
 
+.search-container {
+	padding: 0;
+	margin-top: 18px;
+	position: absolute;
+	background-color: #383838;
+}
+
 /* BUTTONS */
 
 Button {

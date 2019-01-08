@@ -33,6 +33,7 @@ namespace Vertx
 		private DocumentationPageRoot<T> pageRoot;
 		private VisualElement windowRoot;
 		private readonly VisualElement contentRoot;
+		private readonly VisualElement searchRoot;
 
 		private readonly T window;
 
@@ -47,10 +48,13 @@ namespace Vertx
 		private readonly Dictionary<IDocumentationPage<T>, List<DocumentationPage<T>.ButtonInjection>> belowButtonLinks = new Dictionary<IDocumentationPage<T>, List<DocumentationPage<T>.ButtonInjection>>();
 
 
+		private readonly string searchFieldName;
+		
 		public DocumentationContent(VisualElement root, T window, string stateEditorPrefsKey = null)
 		{
 			this.window = window;
 			this.stateEditorPrefsKey = stateEditorPrefsKey;
+			searchFieldName = $"SearchField_{window.GetType().FullName}";
 
 			IMGUIContainer browserBar = new IMGUIContainer(BrowserBar)
 			{
@@ -76,6 +80,14 @@ namespace Vertx
 			scrollView.contentContainer.AddToClassList("scroll-view-content");
 			contentRoot = scrollView.contentContainer;
 			root.Add(scrollView);
+			
+			searchRoot = new VisualElement();
+			searchRoot.ClearClassList();
+			searchRoot.AddToClassList("search-container");
+			root.Add(searchRoot);
+			searchRoot.StretchToParentSize();
+			searchRoot.visible = false;
+			
 			SetCurrentDefaultRoot(contentRoot);
 		}
 
@@ -221,9 +233,12 @@ namespace Vertx
 				Debug.LogError($"Window does not contain a reference to {pageFullName}.");
 				return false;
 			}
+			LoadPage(page);
+			return true;
+		}
 
-
-			VisualElement root = contentRoot;
+		private void LoadPage (IDocumentationPage<T> page, VisualElement rootOverride = null) {
+			VisualElement root = rootOverride ?? contentRoot;
 			SetCurrentDefaultRoot(root);
 			root.Clear();
 
@@ -251,7 +266,7 @@ namespace Vertx
 			if (belowButtonLinks.TryGetValue(page, out var buttonsBelow))
 				AddInjectedButtons(buttonsBelow);
 
-			currentPageStateName = pageFullName;
+			currentPageStateName = page.GetType().FullName;
 
 			void AddInjectedButtons(List<DocumentationPage<T>.ButtonInjection> buttons)
 			{
@@ -266,8 +281,6 @@ namespace Vertx
 					window.AddFullWidthButton(pageOfOrigin.Title, pageOfOrigin.Color, () => GoToPage(pageOfOrigin.GetType().FullName));
 				}
 			}
-
-			return true;
 		}
 
 		void BrowserBar()
@@ -296,19 +309,75 @@ namespace Vertx
 			Rect searchRect = new Rect(w2, 2, w2, 16);
 			using (EditorGUI.ChangeCheckScope changeCheckScope = new EditorGUI.ChangeCheckScope())
 			{
+				GUI.SetNextControlName(searchFieldName);
 				searchString = EditorGUIExtensions.ToolbarSearchField(searchRect, searchString);
+
+				if (!searchRoot.visible && !string.IsNullOrEmpty(searchString) && GUI.GetNameOfFocusedControl().Equals(searchFieldName))
+					searchRoot.visible = true;
 				if (changeCheckScope.changed)
+					DoSearch();
+			}
+		}
+
+		#region Search
+
+		private readonly Dictionary<IDocumentationPage<T>, List<string>> searchStringsCache = new Dictionary<IDocumentationPage<T>,List<string>>();
+
+		void DoSearch()
+		{
+			if (string.IsNullOrEmpty(searchString))
+			{
+				searchRoot.Clear();
+				searchRoot.visible = false;
+				return;
+			}
+
+			string searchStringLower = searchString.ToLower();
+						
+			//Clear the previous search
+			searchRoot.Clear();
+			searchRoot.visible = true;
+
+			//searchRootTemp is an un-parented root to append to so we can search content.
+			VisualElement searchRootTemp = new VisualElement();
+			Dictionary<IDocumentationPage<T>, List<string>> searchResults = new Dictionary<IDocumentationPage<T>, List<string>>();
+
+			foreach (IDocumentationPage<T> page in pages.Values)
+			{
+				if (!searchStringsCache.TryGetValue(page, out var searchStrings))
 				{
-					if (string.IsNullOrEmpty(searchString))
-						GoToPage(currentPageStateName, true);
-					else
+					searchStrings = new List<string>();
+					searchStringsCache.Add(page, searchStrings);
+					
+					//Load the page under searchRootTemp
+					LoadPage(page, searchRootTemp);
+					//Get all the text from the Text elements under searchRootTemp
+					searchRootTemp.Query<TextElement>().Build().ForEach(element => searchStrings.Add(element.text.ToLower()));
+				}
+
+				foreach (string searchStringLocal in searchStrings)
+				{
+					if (searchStringLocal.Contains(searchStringLower))
 					{
-						//TODO
-//						DoSearch();
+						if(!searchResults.TryGetValue(page, out var resultStrings))
+							searchResults.Add(page, resultStrings = new List<string>());
+						resultStrings.Add(searchStringLocal);
 					}
 				}
 			}
+
+			foreach (var searchResult in searchResults)
+			{
+				Button searchResultButton = window.AddFullWidthButton(searchResult.Key.GetType(), searchRoot);
+				searchResultButton.text = $"{searchResult.Value.Count}x {searchResultButton.text}";
+				searchResultButton.userData = searchResult.Key;
+				searchResultButton.RegisterCallback<MouseUpEvent>(evt => searchRoot.visible = false);
+			}
+			
+			searchRoot.Sort((a,b)=>searchResults[(IDocumentationPage<T>) b.userData].Count.CompareTo(searchResults[(IDocumentationPage<T>) a.userData].Count));
 		}
+
+		#endregion
 
 		#region History
 

@@ -24,7 +24,7 @@ namespace Vertx.Example
 			window.AddRichText("You can style text with <i>italics</i>:\n<code>\"<i>italics</i>\"</code>");
 			
 			//Bold Italics
-			window.AddRichText("You can style text with <b><i>italics</i></b>:\n<code>\"<b><i>bold-italics</i></b>\"</code>");
+			window.AddRichText("You can style text with <b><i>bold-italics</i></b>:\n<code>\"<b><i>bold-italics</i></b>\"</code>");
 			
 			//Colour
 			window.AddRichText($"You can style text with {RichTextUtility.GetColouredString("colour", Color.cyan)}:\n<code>\"<color=#00FFFF>color</color>\"</code>");
