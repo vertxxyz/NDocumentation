@@ -17,5 +17,8 @@ namespace Vertx {
         
         public abstract bool RegisterButton(string key, Action action);
         public abstract bool GetRegisteredButtonAction(string key, out Action action);
+        
+        public abstract bool HasHistory();
+        public abstract void ClearHistory();
     }
 }

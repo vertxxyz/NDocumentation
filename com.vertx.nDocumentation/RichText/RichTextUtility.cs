@@ -165,7 +165,7 @@ namespace Vertx
 								FieldInfo font = inheritedStylesData.GetField("font", BindingFlags.Public | BindingFlags.Instance);
 								FieldInfo fontSize = inheritedStylesData.GetField("fontSize", BindingFlags.Public | BindingFlags.Instance);
 								
-								contentContainer.Query<Label>().Build().ForEach(l =>
+								contentContainer.Query<Label>().ForEach(l =>
 								{
 									l.AddToClassList("code");
 									

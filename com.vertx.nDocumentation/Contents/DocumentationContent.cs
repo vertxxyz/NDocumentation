@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -11,6 +13,7 @@ namespace Vertx
 	{
 		//The editor prefs key for the state of this DocumentationContent.
 		private readonly string stateEditorPrefsKey;
+		private readonly string searchEditorPrefsKey;
 		private string searchString = string.Empty;
 
 		//The default root is set as pages are added as to provide an easy way for content to be added without providing the root to functions constantly.
@@ -54,6 +57,7 @@ namespace Vertx
 		{
 			this.window = window;
 			this.stateEditorPrefsKey = stateEditorPrefsKey;
+			searchEditorPrefsKey = $"{stateEditorPrefsKey}_Search";
 			searchFieldName = $"SearchField_{window.GetType().FullName}";
 
 			IMGUIContainer browserBar = new IMGUIContainer(BrowserBar)
@@ -105,6 +109,9 @@ namespace Vertx
 			{
 				Home();
 			}
+
+			if (EditorPrefs.HasKey(searchEditorPrefsKey))
+				searchString = EditorPrefs.GetString(searchEditorPrefsKey);
 
 			return true;
 
@@ -313,7 +320,12 @@ namespace Vertx
 				searchString = EditorGUIExtensions.ToolbarSearchField(searchRect, searchString);
 
 				if (!searchRoot.visible && !string.IsNullOrEmpty(searchString) && GUI.GetNameOfFocusedControl().Equals(searchFieldName))
+				{
 					searchRoot.visible = true;
+					if(searchStringsCache.Count == 0)
+						DoSearch();
+				}
+
 				if (changeCheckScope.changed)
 					DoSearch();
 			}
@@ -322,9 +334,12 @@ namespace Vertx
 		#region Search
 
 		private readonly Dictionary<IDocumentationPage<T>, List<string>> searchStringsCache = new Dictionary<IDocumentationPage<T>,List<string>>();
-
+		private const int maxMatchCount = 6;
+		
 		void DoSearch()
 		{
+			EditorPrefs.SetString(searchEditorPrefsKey, searchString);
+			
 			if (string.IsNullOrEmpty(searchString))
 			{
 				searchRoot.Clear();
@@ -334,6 +349,9 @@ namespace Vertx
 
 			string searchStringLower = searchString.ToLower();
 						
+			//Cache current page
+			string currentPageStateNameCached = currentPageStateName;
+			
 			//Clear the previous search
 			searchRoot.Clear();
 			searchRoot.visible = true;
@@ -342,6 +360,7 @@ namespace Vertx
 			VisualElement searchRootTemp = new VisualElement();
 			Dictionary<IDocumentationPage<T>, List<string>> searchResults = new Dictionary<IDocumentationPage<T>, List<string>>();
 
+			StringBuilder stringBuilder = new StringBuilder();
 			foreach (IDocumentationPage<T> page in pages.Values)
 			{
 				if (!searchStringsCache.TryGetValue(page, out var searchStrings))
@@ -351,8 +370,17 @@ namespace Vertx
 					
 					//Load the page under searchRootTemp
 					LoadPage(page, searchRootTemp);
+					
+					//Get all the paragraph element's text (combined together)
+					searchRootTemp.Query(null, "paragraph-container").ForEach(paragraph =>
+					{
+						stringBuilder.Clear();
+						paragraph.Query<TextElement>().Build().ForEach(tE => stringBuilder.Append(tE.text));
+						searchStrings.Add(stringBuilder.ToString());
+						paragraph.Clear();
+					});
 					//Get all the text from the Text elements under searchRootTemp
-					searchRootTemp.Query<TextElement>().Build().ForEach(element => searchStrings.Add(element.text.ToLower()));
+					searchRootTemp.Query<TextElement>().ForEach(element => searchStrings.Add(element.text.ToLower()));
 				}
 
 				foreach (string searchStringLocal in searchStrings)
@@ -365,22 +393,103 @@ namespace Vertx
 					}
 				}
 			}
+			
+			List<string> matches = new List<string>(maxMatchCount);
 
-			foreach (var searchResult in searchResults)
+			foreach (var result in searchResults)
 			{
-				Button searchResultButton = window.AddFullWidthButton(searchResult.Key.GetType(), searchRoot);
-				searchResultButton.text = $"{searchResult.Value.Count}x {searchResultButton.text}";
-				searchResultButton.userData = searchResult.Key;
+				//Result Container
+				VisualElement resultContainer = new VisualElement();
+				resultContainer.ClearClassList();
+				resultContainer.AddToClassList("result-container");
+				resultContainer.userData = result.Key;
+				searchRoot.Add(resultContainer);
+
+				//Result Button
+				Button searchResultButton = window.AddFullWidthButton(result.Key.GetType(), resultContainer);
+				searchResultButton.AddToClassList("result");
+				Label resultLabel = RichTextUtility.AddInlineText(searchResultButton.text, searchResultButton);
+				resultLabel.style.color = searchResultButton.style.color;
+				searchResultButton.text = null;
+				Label resultCountLabel = RichTextUtility.AddInlineText($" ({result.Value.Count} Results)", searchResultButton);
+				resultCountLabel.style.color = new Color(1, 1, 1, 0.35f);
 				searchResultButton.RegisterCallback<MouseUpEvent>(evt => searchRoot.visible = false);
+				
+				//Results (the string matches)
+				VisualElement resultMatchesContainer = new VisualElement();
+				resultMatchesContainer.ClearClassList();
+				resultMatchesContainer.AddToClassList("result-matches-container");
+				resultContainer.Add(resultMatchesContainer);
+								
+				//Create a hashset of all the matched words.
+				matches.Clear();
+				foreach (string m in result.Value)
+				{
+					string match = Regex.Match(m, $@"\w*{searchStringLower}\w*").Value;
+					if (matches.Contains(match))
+						continue;
+					matches.Add(match);
+					if (matches.Count > maxMatchCount)
+						break;
+				}
+				//Add a max of maxMatchCount inline text to the resultMatchesContainer
+				int l = Mathf.Min(maxMatchCount, matches.Count);
+				for (int i = 0; i < l; i++)
+				{
+					//Create group for matched coloured text.
+					VisualElement inlineTextGroup = new VisualElement();
+					inlineTextGroup.ClearClassList();
+					inlineTextGroup.AddToClassList("inline-text-group");
+					inlineTextGroup.AddToClassList("result");
+					resultMatchesContainer.Add(inlineTextGroup);
+
+					int indexOf = matches[i].IndexOf(searchStringLower, StringComparison.Ordinal);
+
+					Label matchContent;
+					if (matches[i].Length == searchStringLower.Length)
+					{
+						matchContent = RichTextUtility.AddInlineText(matches[i], inlineTextGroup);
+					}
+					else if (indexOf == 0)
+					{
+						matchContent = RichTextUtility.AddInlineText(matches[i].Substring(indexOf, searchStringLower.Length), inlineTextGroup);
+						RichTextUtility.AddInlineText(matches[i].Substring(searchStringLower.Length), inlineTextGroup);
+					}else if (indexOf == matches[i].Length - searchStringLower.Length)
+					{
+						RichTextUtility.AddInlineText(matches[i].Substring(0, indexOf), inlineTextGroup);
+						matchContent = RichTextUtility.AddInlineText(matches[i].Substring(indexOf), inlineTextGroup);
+					}
+					else
+					{
+						RichTextUtility.AddInlineText(matches[i].Substring(0, indexOf), inlineTextGroup);
+						matchContent = RichTextUtility.AddInlineText(matches[i].Substring(indexOf, searchStringLower.Length), inlineTextGroup);
+						RichTextUtility.AddInlineText(matches[i].Substring(indexOf + searchStringLower.Length), inlineTextGroup);
+					}
+					matchContent.style.color = new Color(1, 0.5f, 0);
+				}
+
+				if (l != matches.Count)
+					RichTextUtility.AddInlineText("...", resultMatchesContainer);
 			}
 			
 			searchRoot.Sort((a,b)=>searchResults[(IDocumentationPage<T>) b.userData].Count.CompareTo(searchResults[(IDocumentationPage<T>) a.userData].Count));
+			
+			//Reset page
+			currentPageStateName = currentPageStateNameCached;
 		}
 
 		#endregion
 
 		#region History
 
+		public override bool HasHistory() => history.Count > 0 || forwardHistory.Count > 0;
+
+		public override void ClearHistory()
+		{
+			history.Clear();
+			forwardHistory.Clear();
+		}
+		
 		private readonly Stack<string> history = new Stack<string>();
 		private string _currentPageStateName;
 
@@ -429,7 +538,11 @@ namespace Vertx
 		public override void GoToPage(string pageName, bool addToHistory = true)
 		{
 			if (addToHistory)
-				history.Push(currentPageStateName);
+			{
+				if(currentPageStateName != pageName)
+					history.Push(currentPageStateName);
+			}
+
 			LoadPage(pageName);
 		}
 

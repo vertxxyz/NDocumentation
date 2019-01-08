@@ -11,7 +11,7 @@ namespace Vertx
 	/// DocumentationPageRoot, DocumentationPage, and DocumentationPageAddition.
 	/// This window provides functions for adding rich text to these pages, whilst also being a platform for consistent layout.
 	/// </summary>
-	public abstract class DocumentationWindow : EditorWindow
+	public abstract class DocumentationWindow : EditorWindow, IHasCustomMenu
 	{
 		/// <summary>
 		/// A EditorPrefs key for use tracking window state.
@@ -201,6 +201,17 @@ namespace Vertx
 		#endregion
 
 		#region Navigation
+		
+		
+
+		//Clear History
+		public void AddItemsToMenu(GenericMenu menu)
+		{
+			if (content.HasHistory())
+				menu.AddItem(new GUIContent("Clear History"), false, content.ClearHistory);
+			else
+				menu.AddDisabledItem(new GUIContent("Clear History"));
+		}
 
 		public void Home() => content.Home();
 
