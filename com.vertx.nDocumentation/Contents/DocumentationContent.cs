@@ -376,16 +376,17 @@ namespace Vertx
 					{
 						stringBuilder.Clear();
 						paragraph.Query<TextElement>().Build().ForEach(tE => stringBuilder.Append(tE.text));
-						searchStrings.Add(stringBuilder.ToString().ToLower());
+						searchStrings.Add(stringBuilder.ToString());
 						paragraph.Clear();
 					});
 					//Get all the text from the Text elements under searchRootTemp
-					searchRootTemp.Query<TextElement>().ForEach(element => searchStrings.Add(element.text.ToLower()));
+					searchRootTemp.Query<TextElement>().ForEach(element => searchStrings.Add(element.text));
 				}
 
 				foreach (string searchStringLocal in searchStrings)
 				{
-					if (searchStringLocal.Contains(searchStringLower))
+					string searchStringLocalLower = searchStringLocal.ToLower();
+					if (searchStringLocalLower.Contains(searchStringLower))
 					{
 						if(!searchResults.TryGetValue(page, out var resultStrings))
 							searchResults.Add(page, resultStrings = new List<string>());
@@ -425,7 +426,7 @@ namespace Vertx
 				matches.Clear();
 				foreach (string m in result.Value)
 				{
-					string match = Regex.Match(m, $@"\w*{searchStringLower}\w*").Value;
+					string match = Regex.Match(m, $@"\w*{searchStringLower}\w*", RegexOptions.IgnoreCase).Value;
 					if (matches.Contains(match))
 						continue;
 					matches.Add(match);
@@ -443,7 +444,7 @@ namespace Vertx
 					inlineTextGroup.AddToClassList("result");
 					resultMatchesContainer.Add(inlineTextGroup);
 
-					int indexOf = matches[i].IndexOf(searchStringLower, StringComparison.Ordinal);
+					int indexOf = matches[i].IndexOf(searchStringLower, StringComparison.OrdinalIgnoreCase);
 
 					Label matchContent;
 					if (matches[i].Length == searchStringLower.Length)
