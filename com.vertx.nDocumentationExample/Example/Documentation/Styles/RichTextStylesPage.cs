@@ -4,6 +4,7 @@ using UnityEngine.UIElements;
 
 namespace Vertx.Example
 {
+	// ReSharper disable once ClassNeverInstantiated.Global
 	public class RichTextStylesPage : DocumentationPageAddition<ExampleWindow>
 	{
 		public override Type PageToAddToType => typeof(StylingPage);

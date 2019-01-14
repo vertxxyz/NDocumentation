@@ -1,5 +1,4 @@
-﻿using UnityEditor;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UIElements;
 using static Vertx.DocumentationWindow;
 using static Vertx.Example.WindowPage;

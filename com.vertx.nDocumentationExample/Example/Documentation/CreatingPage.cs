@@ -28,7 +28,7 @@ namespace Vertx.Example
     }
 }</code>");
 			window.AddRichText($"To add a {DocumentationPageSimpleString} as the Root of a {DocumentationWindowString}, provide a ButtonInjection with a {DocumentationWindowButton} Type in the first index. <b>Eg.</b>\n" +
-			                   "<code>public override ButtonInjection[] InjectedButtonLinks =>\n" + "\tnew []{new ButtonInjection(typeof(FooWindow), 0)};</code>");
+			                   "<code>public override ButtonInjection[] InjectedButtonLinks => new []{new ButtonInjection(typeof(FooWindow), 0)};</code>");
 			window.AddRichText($"You can optionally extend a {DocumentationPageString} with additional content by using a {DocumentationPageAdditionString}. (see {ExtendingPagesButton})");
 		}
 

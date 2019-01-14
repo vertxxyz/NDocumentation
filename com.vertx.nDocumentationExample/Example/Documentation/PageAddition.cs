@@ -5,6 +5,7 @@ using static Vertx.RichTextUtility;
 
 namespace Vertx.Example
 {
+	// ReSharper disable once ClassNeverInstantiated.Global
 	public sealed class PageAddition : DocumentationPageAddition<ExampleWindow>
 	{
 		public override Type PageToAddToType => typeof(ExtendingPages);
