@@ -16,11 +16,11 @@ Editor tools spread over multiple packages can rely on an nDocumentation window 
 If a Documentation Page was defined in a core package, a package with a reliance on it can add additions to that Page's content. This enables a minimal amount of coherent pages whilst maintaining a high amount of documentation.
 
 ## Documentation
-The provided nDocumentationExample is self documenting. 
+The provided nDocumentationExample package is self documenting it contains a window present in Window>Example Window. 
 
 ## Installation
 Ensure your project is on .NET 4.x by navigating to Edit>Project Settings>Player>Configuration>Scripting Runtime Version and switching to .NET 4.x Equivalent.
 
-Use the Package Manager (Window>Package Manager) and add the appropriate package.json files in the root of each folder.
+Use the Package Manager (Window>Package Manager) and add the appropriate package.json files present in the root of each folder.
 
 ![Example Window](Example.png)
