@@ -1,6 +1,8 @@
 # nDocumentation
 An extensible documentation window for the Unity Editor that displays rich text pages.
 
+##🚨 WORK IN PROGRESS AND HEAVILY EXPERIMENTAL 🚨
+
 **Minimum Currently Supported Version : Unity 2019**
 
 **2019.1.0a12 is not supported due to an issue with nested scroll views.**
