@@ -118,22 +118,27 @@ namespace Vertx
 		/// <param name="fontSizeOverride">Font size override.</param>
 		/// <param name="fontStyleOverride">Font style override.</param>
 		/// <param name="root">Visual Element to append the header to, current default if left null</param>
-		/// <returns>A list of all immediate children added to the root.</returns>
-		public List<VisualElement> AddHeader(string text, int fontSizeOverride = 0, FontStyle fontStyleOverride = FontStyle.Bold, VisualElement root = null)
+		/// <returns>The VisualElement that contains the rich text paragraph and splitter. .</returns>
+		public VisualElement AddHeader(string text, int fontSizeOverride = 0, FontStyle fontStyleOverride = FontStyle.Bold, VisualElement root = null)
 		{
-			List<VisualElement> header = AddRichText(text, root);
-			foreach (VisualElement h in header)
+			VisualElement headerContainer = new VisualElement();
+			GetDefaultRoot().Add(headerContainer);
+			using (new DefaultRootScope(this, headerContainer))
 			{
-				if (!(h is Label l)) continue;
-				l.AddToClassList("header");
-				if (fontStyleOverride != FontStyle.Bold)
-					l.style.unityFontStyleAndWeight = fontStyleOverride;
-				if (fontSizeOverride > 0)
-					l.style.fontSize = fontSizeOverride;
+				List<VisualElement> header = AddRichText(text, root);
+				foreach (VisualElement h in header)
+				{
+					if (!(h is Label l)) continue;
+					l.AddToClassList("header");
+					if (fontStyleOverride != FontStyle.Bold)
+						l.style.unityFontStyleAndWeight = fontStyleOverride;
+					if (fontSizeOverride > 0)
+						l.style.fontSize = fontSizeOverride;
+				}
+				header.Add(AddSplitter());
 			}
-			
-			header.Add(AddSplitter(true, false, root));
-			return header;
+
+			return headerContainer;
 		}
 
 		#endregion
@@ -143,16 +148,13 @@ namespace Vertx
 		/// <summary>
 		/// Adds a splitter (a horizontal break line)
 		/// </summary>
-		/// <param name="halfSize">A fixed-width small version of the splitter</param>
 		/// <param name="inverseColor">Whether to inverse the colour scheme</param>
 		/// <param name="root">Root, current default if left null</param>
 		/// <returns>The splitter element</returns>
-		public VisualElement AddSplitter(bool halfSize = false, bool inverseColor = false, VisualElement root = null)
+		public VisualElement AddSplitter(bool inverseColor = false, VisualElement root = null)
 		{
 			VisualElement halfSplitter = new VisualElement();
 			halfSplitter.AddToClassList("splitter");
-			if (halfSize)
-				halfSplitter.AddToClassList("half");
 			if (inverseColor)
 				halfSplitter.AddToClassList("inverse");
 			content.AddToRoot(halfSplitter, root);
@@ -183,7 +185,7 @@ namespace Vertx
 		public void SetDefaultRoot(VisualElement root) => content.SetCurrentDefaultRoot(root);
 		public VisualElement GetDefaultRoot() => content.GetRoot();
 
-		public sealed class DefaultRootScope : IDisposable
+		public struct DefaultRootScope : IDisposable
 		{
 			private readonly VisualElement lastRoot;
 			private readonly DocumentationWindow window;
@@ -191,7 +193,7 @@ namespace Vertx
 			public DefaultRootScope(DocumentationWindow window, VisualElement rootOverride)
 			{
 				this.window = window;
-				lastRoot = window.content.GetRoot(null);
+				lastRoot = window.content.GetRoot();
 				window.content.SetCurrentDefaultRoot(rootOverride);
 			}
 

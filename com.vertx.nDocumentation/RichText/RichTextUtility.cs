@@ -151,9 +151,7 @@ namespace Vertx
 									{
 										child.AddToClassList("code");
 										if (child.childCount == 1)
-										{
-											AddInlineText("", child);
-										}
+											AddInlineText("", child);//This seems to be required to get layout to function properly.
 									}
 								}
 								
@@ -164,7 +162,8 @@ namespace Vertx
 								Type inheritedStylesData = Type.GetType("UnityEngine.UIElements.StyleSheets.InheritedStylesData,UnityEngine");
 								FieldInfo font = inheritedStylesData.GetField("font", BindingFlags.Public | BindingFlags.Instance);
 								FieldInfo fontSize = inheritedStylesData.GetField("fontSize", BindingFlags.Public | BindingFlags.Instance);
-								
+								Font consola = (Font) EditorGUIUtility.Load("consola");
+
 								contentContainer.Query<Label>().ForEach(l =>
 								{
 									l.AddToClassList("code");
@@ -173,10 +172,9 @@ namespace Vertx
 									//Hack to regenerate the font size as Rich Text tags are removed from the original calculation.
 									object value = m_inheritedStyle.GetValue(l);
 									StyleFont fontVar = (StyleFont)font.GetValue(value);
-									fontVar.value = (Font) EditorGUIUtility.Load("consola");
+									fontVar.value = consola;
 									font.SetValue(value, fontVar);
-									StyleLength fontSizeVar = (StyleLength) fontSize.GetValue(value);
-									fontSizeVar = 12;
+									StyleLength fontSizeVar = 12;// = (StyleLength) fontSize.GetValue(value); //This doesn't seem to work properly, hard coded for now.
 									fontSize.SetValue(value, fontSizeVar);
 									m_inheritedStyle.SetValue(l, value);
 									Vector2 measuredTextSize = l.MeasureTextSize(l.text.Replace('>', ' '), 0, VisualElement.MeasureMode.Undefined, 0, VisualElement.MeasureMode.Undefined);

@@ -12,7 +12,7 @@ namespace Vertx.Example
 
 		public override void DrawDocumentation(ExampleWindow window, VisualElement root)
 		{
-			window.AddRichText($"This content after the header has been injected into the page using a {DocumentationPageAdditionString}.");
+			window.AddRichText($"<b><i>This content</i></b> has been injected into the page using a {DocumentationPageAdditionString}.");
 
 			window.AddRichText(@"<code>public class FooAddition : DocumentationPageAddition<FooWindow>
 {

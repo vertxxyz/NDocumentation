@@ -6,8 +6,7 @@ namespace Vertx
 {
 	public sealed class StylingPage : DocumentationPage<ExampleWindow>
 	{
-		public override ButtonInjection[] InjectButtonLinkAbove => null;
-		public override ButtonInjection[] InjectButtonLinkBelow => new[] {new ButtonInjection(typeof(LandingPage), 4)};
+		public override ButtonInjection[] InjectedButtonLinks => new[] {new ButtonInjection(typeof(LandingPage), 4)};
 		public override Color Color => StylingColor;
 		public override string Title => "Styling Pages";
 

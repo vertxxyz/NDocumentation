@@ -11,14 +11,12 @@ namespace Vertx
 	public abstract class DocumentationPage<T> : IDocumentationPage<T> where T : DocumentationWindow
 	{
 		#region Button Links
+
 		/// <summary>
-		/// Page link Button to be injected above a DocumentationPage's content
+		/// Page link Button to be injected below a DocumentationPage's content.
+		/// If your page is the root of the DocumentationWindow, use a ButtonInjection with your DocumentationWindow Type as the first index.
 		/// </summary>
-		public abstract ButtonInjection[] InjectButtonLinkAbove { get; }
-		/// <summary>
-		/// Page link Button to be injected below a DocumentationPage's content
-		/// </summary>
-		public abstract ButtonInjection[] InjectButtonLinkBelow { get; }
+		public abstract ButtonInjection[] InjectedButtonLinks { get; }
 
 		/// <summary>
 		/// A description of a button to be injected above or below a DocumentationPage's content.
@@ -26,30 +24,33 @@ namespace Vertx
 		public class ButtonInjection
 		{
 			/// <summary>
-			/// Type name nameof(DocumentationPage) that should contain this page's link
+			/// Type of DocumentationPage that should contain this page's link.
+			/// If your page is the root of the DocumentationWindow, use a ButtonInjection with your DocumentationWindow Type.
 			/// </summary>
-			public readonly Type pageType;
+			public readonly Type ParentType;
+
 			/// <summary>
 			/// The order this link is injected (lower is higher)
 			/// </summary>
-			public readonly float order;
+			public readonly float Order;
 
-			public ButtonInjection(Type pageType, float order)
+			public ButtonInjection(Type parentType, float order)
 			{
-				this.pageType = pageType;
-				this.order = order;
+				ParentType = parentType;
+				Order = order;
 			}
 
 			/// <summary>
 			/// Assigned internally.
 			/// </summary>
-			public DocumentationPage<T> pageOfOrigin;
+			public DocumentationPage<T> PageOfOrigin;
 		}
+
 		#endregion
-		
+
 		public abstract Color Color { get; }
 		public abstract string Title { get; }
-		
+
 		public abstract void DrawDocumentation(T window, VisualElement root);
 		public virtual void DrawDocumentationAfterAdditions(T window, VisualElement root) { }
 		public virtual void Initialise(T window) { }

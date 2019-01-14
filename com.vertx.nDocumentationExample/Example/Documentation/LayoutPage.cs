@@ -9,15 +9,14 @@ namespace Vertx.Example
 {
 	public sealed class LayoutPage : DocumentationPage<ExampleWindow>
 	{
-		public override ButtonInjection[] InjectButtonLinkAbove => null;
-		public override ButtonInjection[] InjectButtonLinkBelow => null;
+		public override ButtonInjection[] InjectedButtonLinks => null;
 		public override Color Color => LayoutColor;
 		public override string Title => "Page Layout";
 
 		public override void DrawDocumentation(ExampleWindow window, VisualElement root)
 		{
 			window.AddHeader(Title, 18, FontStyle.Normal);
-			window.AddRichText($"All Pages are laid out in the same fashion.\nThere are above and below <i>Button Injection</i> locations, and in between is the <i>Content</i> section. The content section first contains original content provided by the page, then content added by {PageAddition.DocumentationPageAdditionsSpacedString}.");
+			window.AddRichText($"All Pages are laid out in the same fashion.\nThere is a <i>Content</i> section followed by <i>Button Injection</i>s. The content section first contains original content provided by the {CreatingPage.DocumentationPageSimpleString}, then content added by {PageAddition.DocumentationPageAdditionsSpacedString}.");
 
 			// Window
 			VisualElement windowContainer = new Button(()=>window.GoToPage(typeof(WindowPage)));
@@ -26,13 +25,6 @@ namespace Vertx.Example
 			using (new DefaultRootScope(window, windowContainer))
 			{
 				window.AddRichText(DocumentationWindowString);
-				{ // Above
-					VisualElement buttonInjectionAboveContainer = new VisualElement();
-					ModifyStyle(buttonInjectionAboveContainer, ExtendingPages.InjectColor, 6);
-					windowContainer.Add(buttonInjectionAboveContainer);
-					using (new DefaultRootScope(window, buttonInjectionAboveContainer))
-						window.AddRichText(GetColouredString("Button Links Injected Above", ExtendingPages.InjectColor));
-				}
 
 				{ // Content
 					VisualElement contentContainer = new Button(()=>window.GoToPage(typeof(CreatingPage)));
@@ -59,14 +51,12 @@ namespace Vertx.Example
 				}
 
 				{ // Below
-					VisualElement buttonInjectionBelowContainer = new VisualElement();
-					ModifyStyle(buttonInjectionBelowContainer, ExtendingPages.InjectColor, 6);
-					windowContainer.Add(buttonInjectionBelowContainer);
-					using (new DefaultRootScope(window, buttonInjectionBelowContainer))
-						window.AddRichText(GetColouredString("Button Links Injected Below", ExtendingPages.InjectColor));
+					VisualElement injectedButtonsContainer = new VisualElement();
+					ModifyStyle(injectedButtonsContainer, ExtendingPages.InjectColor, 6);
+					windowContainer.Add(injectedButtonsContainer);
+					using (new DefaultRootScope(window, injectedButtonsContainer))
+						window.AddRichText(GetColouredString("Injected Button Links", ExtendingPages.InjectColor));
 				}
-
-				EditorApplication.delayCall += ()=> ModifyStyle(new VisualElement(), Color.white, 0);
 			}
 		}
 

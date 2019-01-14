@@ -33,7 +33,7 @@ namespace Vertx
 		/// <param name="root">Root to add to</param>
 		public override void AddToRoot(VisualElement element, VisualElement root = null) => GetRoot(root).Add(element);
 
-		private DocumentationPageRoot<T> pageRoot;
+		private DocumentationPage<T> pageRoot;
 		private VisualElement windowRoot;
 		private readonly VisualElement contentRoot;
 		private readonly VisualElement searchRoot;
@@ -47,8 +47,7 @@ namespace Vertx
 		private readonly Dictionary<IDocumentationPage<T>, List<DocumentationPageAddition<T>>> additions = new Dictionary<IDocumentationPage<T>, List<DocumentationPageAddition<T>>>();
 
 		//Page to buttons injected into it.
-		private readonly Dictionary<IDocumentationPage<T>, List<DocumentationPage<T>.ButtonInjection>> aboveButtonLinks = new Dictionary<IDocumentationPage<T>, List<DocumentationPage<T>.ButtonInjection>>();
-		private readonly Dictionary<IDocumentationPage<T>, List<DocumentationPage<T>.ButtonInjection>> belowButtonLinks = new Dictionary<IDocumentationPage<T>, List<DocumentationPage<T>.ButtonInjection>>();
+		private readonly Dictionary<IDocumentationPage<T>, List<DocumentationPage<T>.ButtonInjection>> injectedButtonLinks = new Dictionary<IDocumentationPage<T>, List<DocumentationPage<T>.ButtonInjection>>();
 
 
 		private readonly string searchFieldName;
@@ -117,8 +116,9 @@ namespace Vertx
 
 			bool InitialisePages()
 			{
+				Type windowType = window.GetType();
 				//Find all the documentation and additions to it
-				Type iDocGenericType = typeof(IDocumentation<>).MakeGenericType(window.GetType());
+				Type iDocGenericType = typeof(IDocumentation<>).MakeGenericType(windowType);
 				IEnumerable<IDocumentation<T>> documentation = GetExtensionsOfTypeIE<IDocumentation<T>>(iDocGenericType);
 				List<DocumentationPage<T>> documentationPages = new List<DocumentationPage<T>>();
 				List<DocumentationPageAddition<T>> documentationAdditions = new List<DocumentationPageAddition<T>>();
@@ -131,21 +131,24 @@ namespace Vertx
 							documentationAdditions.Add(pageAddition);
 							break;
 						case DocumentationPage<T> page:
-							documentationPages.Add(page);
-							pages.Add(page.GetType().FullName, page);
-							break;
-						case DocumentationPageRoot<T> pageRoot:
-							pages.Add(pageRoot.GetType().FullName, pageRoot);
-							if (this.pageRoot != null)
+							if (page.InjectedButtonLinks?[0].ParentType == windowType)
 							{
-								Debug.LogError($"Multiple pages are assigned to be the root for window. {this.pageRoot} & {pageRoot}.");
-								continue;
+								if (pageRoot != null)
+								{
+									Debug.LogError($"Multiple pages are assigned to be the root for window. {this.pageRoot} & {pageRoot}.");
+									continue;
+								}
+								pageRoot = page;
+							}
+							else
+							{
+								documentationPages.Add(page);
 							}
 
-							this.pageRoot = pageRoot;
+							pages.Add(page.GetType().FullName, page);
 							break;
 						default:
-							throw new ArgumentOutOfRangeException();
+							throw new ArgumentOutOfRangeException($"{iDoc.GetType()} is not present in the DocumentationContent.InitialiseContent page switch.");
 					}
 
 					iDoc.Initialise(window);
@@ -175,34 +178,24 @@ namespace Vertx
 				//Discover the injected buttons
 				foreach (DocumentationPage<T> iDoc in documentationPages)
 				{
-					DocumentationPage<T>.ButtonInjection[] buttonLinkAbove = iDoc.InjectButtonLinkAbove;
-					if (buttonLinkAbove != null)
-						AddButtonInjections(buttonLinkAbove, "above", aboveButtonLinks);
-
-					DocumentationPage<T>.ButtonInjection[] buttonLinkBelow = iDoc.InjectButtonLinkBelow;
-					if (buttonLinkBelow != null)
-						AddButtonInjections(buttonLinkBelow, "below", belowButtonLinks);
-
-					void AddButtonInjections(DocumentationPage<T>.ButtonInjection[] injections, string location, Dictionary<IDocumentationPage<T>, List<DocumentationPage<T>.ButtonInjection>> dictionary)
+					DocumentationPage<T>.ButtonInjection[] injectedButtons = iDoc.InjectedButtonLinks;
+					if (injectedButtons == null)
+						continue;
+					//For all the buttons in we're injecting
+					foreach (DocumentationPage<T>.ButtonInjection buttonInjection in injectedButtons)
 					{
-						//For all the buttons in we're injecting
-						foreach (DocumentationPage<T>.ButtonInjection buttonInjection in injections)
-						{
-							buttonInjection.pageOfOrigin = iDoc;
-							//We find the relevant page and add our injected button to its dictionary entry
-							GetDocumentationPage<DocumentationPage<T>.ButtonInjection>(buttonInjection.pageType,
-								"does not provide a page to add to.",
-								$"{iDoc.GetType().FullName}'s intended location for button injection ({location}) {buttonInjection.pageType.FullName}",
-								dictionary, buttonInjection);
-						}
+						buttonInjection.PageOfOrigin = iDoc;
+						//We find the relevant page and add our injected button to its dictionary entry
+						GetDocumentationPage<DocumentationPage<T>.ButtonInjection>(buttonInjection.ParentType,
+							"does not provide a page to add to.",
+							$"{iDoc.GetType().FullName}'s intended location for button injection {buttonInjection.ParentType.FullName}",
+							injectedButtonLinks, buttonInjection);
 					}
 				}
 
 				//Sort the injected buttons
-				foreach (List<DocumentationPage<T>.ButtonInjection> buttonInjections in aboveButtonLinks.Values)
-					buttonInjections.Sort((a, b) => a.order.CompareTo(b.order));
-				foreach (List<DocumentationPage<T>.ButtonInjection> buttonInjections in belowButtonLinks.Values)
-					buttonInjections.Sort((a, b) => a.order.CompareTo(b.order));
+				foreach (List<DocumentationPage<T>.ButtonInjection> buttonInjections in injectedButtonLinks.Values)
+					buttonInjections.Sort((a, b) => a.Order.CompareTo(b.Order));
 
 				void GetDocumentationPage<TType>(Type query, string queryNullError, string queryNotIDocError, Dictionary<IDocumentationPage<T>, List<TType>> dictionary, TType add)
 				{
@@ -252,10 +245,6 @@ namespace Vertx
 			//Constant header
 			window.DrawConstantHeader(root);
 
-			//Above buttons
-			if (aboveButtonLinks.TryGetValue(page, out var buttonsAbove))
-				AddInjectedButtons(buttonsAbove);
-
 			//Documentation
 			SetCurrentDefaultRoot(root);
 			page.DrawDocumentation(window, root);
@@ -269,25 +258,22 @@ namespace Vertx
 			
 			page.DrawDocumentationAfterAdditions(window, root);
 
-			//Below buttons
-			if (belowButtonLinks.TryGetValue(page, out var buttonsBelow))
-				AddInjectedButtons(buttonsBelow);
-
-			currentPageStateName = page.GetType().FullName;
-
-			void AddInjectedButtons(List<DocumentationPage<T>.ButtonInjection> buttons)
+			//Button Links
+			if (injectedButtonLinks.TryGetValue(page, out var buttonsBelow))
 			{
 				VisualElement injectedButtonContainer = new VisualElement();
 				injectedButtonContainer.AddToClassList("injected-button-container");
 				AddToRoot(injectedButtonContainer);
 				SetCurrentDefaultRoot(injectedButtonContainer);
 				
-				foreach (DocumentationPage<T>.ButtonInjection button in buttons)
+				foreach (DocumentationPage<T>.ButtonInjection button in buttonsBelow)
 				{
-					DocumentationPage<T> pageOfOrigin = button.pageOfOrigin;
+					DocumentationPage<T> pageOfOrigin = button.PageOfOrigin;
 					window.AddFullWidthButton(pageOfOrigin.Title, pageOfOrigin.Color, () => GoToPage(pageOfOrigin.GetType().FullName));
 				}
 			}
+
+			currentPageStateName = page.GetType().FullName;
 		}
 
 		void BrowserBar()

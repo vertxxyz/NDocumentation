@@ -5,33 +5,18 @@ An extensible documentation window for the Unity Editor that displays rich text 
 
 **2019.1.0a12 is not supported due to an issue with nested scroll views.**
 
+**Currently recommended version: 2019.1.0a13**
+
 ## Usage
 
 ----
-### Pages
+### Intended Use Case:
 
-#### DocumentationWindow
-- Extend *DocumentationWindow* to provide a base window to inject documentation pages into.
-- Override DrawConstantHeader to provide a header to every page.
+Editor tools spread over multiple packages can rely on an nDocumentation window for documentation inside of the Unity Editor.
 
-#### DocumentationPageRoot
-- Extend *DocumentationPageRoot* to define a root page to a *DocumentationWindow*, a root page does not get linked to other than through **Home** links.
-
-#### DocumentationPage
-- Extend *DocumentationPage* to define documentation pages.
-- These pages can inject buttons above or below other page content, either other *DocumentationPage*s or the *DocumentationPageRoot*.
-- The Color and Title provided are used to style these Button Links.
-The buttons are sorted by the Order field, with lower values being displayed above others.
-
-#### DocumentationPageAddition
-- Extend *DocumentationPageAdditition* to add content to DocumentationPages (either *DocumentationPage*s or the *DocumentationPageRoot*.)
-- Additional content is sorted by the Order field, with lower values being displayed above others.
-- Color and Title can be overriden to style these Button Links.
-
-----
-### Content
-
-#### TODO
+If a Documentation Page was defined in a core package, a package with a reliance on it can add additions to that content. This enables a minimal amount of pages whilst maintaining a high amount of documentation.
 
 ## Installation
+Ensure your project is on .NET 4.x by navigating to Edit>Project Settings>Player>Configuration>Scripting Runtime Version and switching to .NET 4.x Equivalent.
+
 Use the Package Manager (Window>Package Manager) and add the appropriate package.json files in the root of each folder.

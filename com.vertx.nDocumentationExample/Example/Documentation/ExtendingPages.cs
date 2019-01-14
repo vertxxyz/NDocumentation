@@ -6,8 +6,7 @@ namespace Vertx.Example
 {
 	public sealed class ExtendingPages : DocumentationPage<ExampleWindow>
 	{
-		public override ButtonInjection[] InjectButtonLinkAbove => null;
-		public override ButtonInjection[] InjectButtonLinkBelow => new[] {new ButtonInjection(typeof(LandingPage), 1)};
+		public override ButtonInjection[] InjectedButtonLinks => new[] {new ButtonInjection(typeof(LandingPage), 1)};
 		public override Color Color => ExtendColor;
 		public override string Title => "Extending Pages";
 
