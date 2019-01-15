@@ -11,7 +11,7 @@ namespace Vertx.Example
 		public override void DrawDocumentation(ExampleWindow window)
 		{
 			window.AddRichText("<span class=\"text-example\">Span Classes</span>\n" +
-			                   @"<code>""<span class=\""class-key\"">Span Classes</>""</code>");//This code has an EN SPACE (" ") present to avoid the span parsing.
+			                   @"<code>""<span class=\""class-key\"">Span Classes</>""</code>");//This code has an 1/4 EM SPACE (" ") present to avoid the span parsing. It also ends in the shorthand </> to avoid parsing errors.
 		}
 	}
 }

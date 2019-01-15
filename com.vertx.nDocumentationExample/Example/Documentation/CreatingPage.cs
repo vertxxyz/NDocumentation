@@ -10,7 +10,7 @@ namespace Vertx.Example
 	{
 		public override ButtonInjection[] InjectedButtonLinks => new[] {new ButtonInjection(typeof(LandingPage), 0)};
 		public override Color Color => CreateColor;
-		public override string Title => "Creating Pages";
+		public override string Title => CreatingPagesString;
 
 		public override void DrawDocumentation(ExampleWindow window)
 		{
@@ -29,11 +29,17 @@ namespace Vertx.Example
 			window.AddRichText($"To add a {DocumentationPageSimpleString} as the Root of a {DocumentationWindowString}, provide a ButtonInjection with a {DocumentationWindowButton} Type in the first index. <b>Eg.</b>\n" +
 			                   "<code>public override ButtonInjection[] InjectedButtonLinks => new []{new ButtonInjection(typeof(FooWindow), 0)};</code>");
 			window.AddRichText($"You can optionally extend a {DocumentationPageString} with additional content by using a {DocumentationPageAdditionString}. (see {ExtendingPagesButton})");
+			window.AddSplitter();
+			window.AddRichText($"{LayoutPage.InjectedButtonLinksString} append a link to the current {DocumentationPageString} to the bottom of the {DocumentationPageString} matching the provided Type. These are ordered by the order parameter, with lower values being above higher.");
+			window.AddVerticalSpace(5);
+			window.AddSplitter();
 		}
 
 		public override void DrawDocumentationAfterAdditions(ExampleWindow window) => LandingPage.AddNextButton(window, typeof(ExtendingPages));
 
 		public static readonly string DocumentationPageSimpleString = GetColouredString("DocumentationPage", CreateColor);
 		public static readonly string DocumentationPageString = GetColouredString(nameof(DocumentationPage<DocumentationWindow>), CreateColor);
+		private const string CreatingPagesString = "Creating Pages";
+		public static readonly string CreatingPageButton = GetButtonString(typeof(CreatingPage), GetColouredString(CreatingPagesString, CreateColor));
 	}
 }

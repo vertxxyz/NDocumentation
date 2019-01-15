@@ -54,7 +54,7 @@ namespace Vertx.Example
 					ModifyStyle(injectedButtonsContainer, ExtendingPages.InjectColor, 6);
 					windowContainer.Add(injectedButtonsContainer);
 					using (new DefaultRootScope(window, injectedButtonsContainer))
-						window.AddRichText(GetColouredString("Injected Button Links", ExtendingPages.InjectColor));
+						window.AddRichText(InjectedButtonLinksString);
 				}
 			}
 			
@@ -81,6 +81,7 @@ namespace Vertx.Example
 
 		public override void DrawDocumentationAfterAdditions(ExampleWindow window) => LandingPage.AddNextButton(window, typeof(WindowPage));
 
+		public static readonly string InjectedButtonLinksString = GetColouredString("Injected Button Links", ExtendingPages.InjectColor);
 		public static readonly Color LayoutColor = new Color(0f, 0.7f, 1f);
 	}
 }
