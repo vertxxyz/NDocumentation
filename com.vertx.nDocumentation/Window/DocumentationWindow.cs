@@ -21,7 +21,7 @@ namespace Vertx
 
 		private DocumentationContentBase content;
 
-		public void InitialiseDocumentationOnRoot<T>(T window, VisualElement root) where T : DocumentationWindow
+		protected void InitialiseDocumentationOnRoot<T>(T window, VisualElement root) where T : DocumentationWindow
 		{
 			content = new DocumentationContent<T>(root, window, StateEditorPrefsKey);
 			content.InitialiseContent();
@@ -134,6 +134,7 @@ namespace Vertx
 					if (fontSizeOverride > 0)
 						l.style.fontSize = fontSizeOverride;
 				}
+
 				header.Add(AddSplitter());
 			}
 
@@ -186,7 +187,7 @@ namespace Vertx
 		/// </summary>
 		/// <param name="root">Visual Element to append Documentation content to by default.</param>
 		public void SetDefaultRoot(VisualElement root) => content.SetCurrentDefaultRoot(root);
-		
+
 		/// <summary>
 		/// You can set the DefaultRoot using a DefaultRootScope or by calling SetDefaultRoot manually.
 		/// </summary>
@@ -211,8 +212,6 @@ namespace Vertx
 		#endregion
 
 		#region Navigation
-		
-		
 
 		//Clear History
 		public void AddItemsToMenu(GenericMenu menu)

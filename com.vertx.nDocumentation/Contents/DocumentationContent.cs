@@ -1,8 +1,11 @@
-﻿using System;
+﻿//#define UIELEMENT_BROWSER_BAR
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using static Vertx.DocumentationUtility;
@@ -19,6 +22,7 @@ namespace Vertx
 		//The default root is set as pages are added as to provide an easy way for content to be added without providing the root to functions constantly.
 		private VisualElement _currentDefaultRoot;
 		public override void SetCurrentDefaultRoot(VisualElement root) => _currentDefaultRoot = root;
+
 		/// <summary>
 		/// Returns the root if provided, otherwise returns the default root.
 		/// </summary>
@@ -51,14 +55,21 @@ namespace Vertx
 
 
 		private readonly string searchFieldName;
-		
+
+		private ToolbarButton backButton;
+		private ToolbarButton forwardButton;
+
 		public DocumentationContent(VisualElement root, T window, string stateEditorPrefsKey = null)
 		{
 			this.window = window;
 			this.stateEditorPrefsKey = stateEditorPrefsKey;
+
 			searchEditorPrefsKey = $"{stateEditorPrefsKey}_Search";
+			if (EditorPrefs.HasKey(searchEditorPrefsKey))
+				searchString = EditorPrefs.GetString(searchEditorPrefsKey);
 			searchFieldName = $"SearchField_{window.GetType().FullName}";
 
+			#if !UIELEMENT_BROWSER_BAR
 			IMGUIContainer browserBar = new IMGUIContainer(BrowserBar)
 			{
 				style =
@@ -67,11 +78,25 @@ namespace Vertx
 				}
 			};
 			root.Add(browserBar);
+			#else
+			BrowserBar(root);
+			#endif
+
+			/*	The content root contains the styles.
+			 It also contains the scroll view and search root, with the scroll view containing the user-generated content */
+			VisualElement content = new VisualElement
+			{
+				style =
+				{
+					flexGrow = 1
+				}
+			};
+			root.Add(content);
 			StyleSheet docsStyleSheet = LoadAssetOfType<StyleSheet>("nDocumentationStyles", SearchFilter.Packages);
-			root.styleSheets.Add(docsStyleSheet);
+			content.styleSheets.Add(docsStyleSheet);
 
 			StyleSheet codeStyleSheet = LoadAssetOfType<StyleSheet>("CsharpHighlightingStyles", SearchFilter.Packages);
-			root.styleSheets.Add(codeStyleSheet);
+			content.styleSheets.Add(codeStyleSheet);
 
 			ScrollView scrollView = new ScrollView
 			{
@@ -82,15 +107,15 @@ namespace Vertx
 			scrollView.AddToClassList("scroll-view");
 			scrollView.contentContainer.AddToClassList("scroll-view-content");
 			contentRoot = scrollView.contentContainer;
-			root.Add(scrollView);
-			
+			content.Add(scrollView);
+
 			searchRoot = new VisualElement();
 			searchRoot.ClearClassList();
 			searchRoot.AddToClassList("search-container");
-			root.Add(searchRoot);
+			content.Add(searchRoot);
 			searchRoot.StretchToParentSize();
 			searchRoot.visible = false;
-			
+
 			SetCurrentDefaultRoot(contentRoot);
 		}
 
@@ -108,9 +133,6 @@ namespace Vertx
 			{
 				Home();
 			}
-
-			if (EditorPrefs.HasKey(searchEditorPrefsKey))
-				searchString = EditorPrefs.GetString(searchEditorPrefsKey);
 
 			return true;
 
@@ -138,6 +160,7 @@ namespace Vertx
 									Debug.LogError($"Multiple pages are assigned to be the root for window. {this.pageRoot} & {pageRoot}.");
 									continue;
 								}
+
 								pageRoot = page;
 							}
 							else
@@ -233,11 +256,13 @@ namespace Vertx
 				Debug.LogError($"Window does not contain a reference to {pageFullName}.");
 				return false;
 			}
+
 			LoadPage(page);
 			return true;
 		}
 
-		private void LoadPage (IDocumentationPage<T> page, VisualElement rootOverride = null) {
+		private void LoadPage(IDocumentationPage<T> page, VisualElement rootOverride = null)
+		{
 			VisualElement root = rootOverride ?? contentRoot;
 			SetCurrentDefaultRoot(root);
 			root.Clear();
@@ -254,7 +279,7 @@ namespace Vertx
 				foreach (var addition in additionsList)
 					addition.DrawDocumentation(window);
 			}
-			
+
 			page.DrawDocumentationAfterAdditions(window);
 
 			//Button Links
@@ -264,7 +289,7 @@ namespace Vertx
 				injectedButtonContainer.AddToClassList("injected-button-container");
 				AddToRoot(injectedButtonContainer);
 				SetCurrentDefaultRoot(injectedButtonContainer);
-				
+
 				foreach (DocumentationPage<T>.ButtonInjection button in buttonsBelow)
 				{
 					DocumentationPage<T> pageOfOrigin = button.PageOfOrigin;
@@ -275,6 +300,9 @@ namespace Vertx
 			currentPageStateName = page.GetType().FullName;
 		}
 
+		/// <summary>
+		/// IMGUI browser bar
+		/// </summary>
 		void BrowserBar()
 		{
 			float w2 = Screen.width / 2f - 5;
@@ -289,10 +317,11 @@ namespace Vertx
 			if (GUI.Button(new Rect(25, 0, 20, 20), new GUIContent(EditorGUIUtility.isProSkin ? GetTexture("Forward") : GetTexture("Forward_Alt"), "Forward"), EditorStyles.toolbarButton))
 				Forward();
 
-			GUI.enabled = currentPageStateName != null && !currentPageStateName.Equals(pageRoot.GetType().FullName);
+			GUI.enabled = currentPageStateName != null && !currentPageStateName.Equals(pageRoot.GetType().FullName) || searchRoot.visible;
 			if (GUI.Button(new Rect(48, 0, 20, 20), new GUIContent(EditorGUIUtility.isProSkin ? GetTexture("Home") : GetTexture("Home_Alt"), "Home"), EditorStyles.toolbarButton))
 			{
 				searchString = string.Empty;
+				searchRoot.visible = false;
 				GUI.FocusControl(null);
 				Home();
 			}
@@ -307,7 +336,7 @@ namespace Vertx
 				if (!searchRoot.visible && !string.IsNullOrEmpty(searchString) && GUI.GetNameOfFocusedControl().Equals(searchFieldName))
 				{
 					searchRoot.visible = true;
-					if(searchStringsCache.Count == 0)
+					if (searchStringsCache.Count == 0)
 						DoSearch();
 				}
 
@@ -316,15 +345,110 @@ namespace Vertx
 			}
 		}
 
+		/// <summary>
+		/// UI Element Browser Bar
+		/// </summary>
+		void BrowserBar(VisualElement root)
+		{
+			#region Browser Bar
+
+			//Browser Bar
+			Toolbar toolbar = new Toolbar();
+			toolbar.style.justifyContent = Justify.SpaceBetween;
+			root.Add(toolbar);
+			// Back Button
+			backButton = AddToolbarButton(EditorGUIUtility.isProSkin ? GetTexture("Back") : GetTexture("Back_Alt"), Back, 5);
+			backButton.SetEnabled(false);
+			toolbar.Add(backButton);
+			// Forward Button
+			forwardButton = AddToolbarButton(EditorGUIUtility.isProSkin ? GetTexture("Forward") : GetTexture("Forward_Alt"), Forward, 0);
+			forwardButton.SetEnabled(false);
+			toolbar.Add(forwardButton);
+			toolbar.Add(AddToolbarButton(EditorGUIUtility.isProSkin ? GetTexture("Home") : GetTexture("Home_Alt"), Home, 2));
+
+			ToolbarButton AddToolbarButton(Texture texture, Action action, float marginLeft)
+			{
+				ToolbarButton toolbarButton = new ToolbarButton(action)
+				{
+					style =
+					{
+						marginLeft = marginLeft,
+						width = 20,
+						borderLeftWidth = marginLeft == 0 ? 0 : 1,
+						borderColor = new Color(0.57f, 0.57f, 0.57f),
+						borderTopLeftRadius = 2,
+						alignItems = Align.Center,
+						paddingBottom = 0,
+						paddingLeft = 0,
+						paddingRight = 0,
+					}
+				};
+				toolbarButton.Add(new Image
+				{
+					image = texture,
+					style =
+					{
+						marginTop = 4,
+						height = 10,
+						width = 10
+					}
+				});
+				return toolbarButton;
+			}
+
+			// Search Bar
+			ToolbarSearchField toolbarSearchField = new ToolbarSearchField();
+			toolbarSearchField.SetValueWithoutNotify(searchString);
+
+			//ToolbarSearchField's buttons have broken hover and action pseudo-states so we have to fix that
+			StyleSheet fixSheet = LoadAssetOfType<StyleSheet>("InbuiltFixStyles", SearchFilter.Packages);
+			toolbarSearchField.styleSheets.Add(fixSheet);
+
+			toolbarSearchField.style.flexGrow = 1;
+			toolbarSearchField.RegisterCallback<ChangeEvent<string>>(evt =>
+			{
+				searchString = evt.newValue;
+				DoSearch();
+			});
+			TextField textField = toolbarSearchField.Q<TextField>();
+			textField.RegisterCallback<FocusEvent>(evt =>
+			{
+				if (searchRoot.visible || string.IsNullOrEmpty(searchString))
+					return;
+				//If there's a search string and we're in the search box we should enable the search container.
+				searchRoot.visible = true;
+				//If there isn't any search (ie. the previously cached search was never built, perform the search)
+				if (searchStringsCache.Count == 0)
+					DoSearch();
+			});
+			//The internal text field has a fixed width so we have to remove that
+			StyleLength width = textField.style.width;
+			width.keyword = StyleKeyword.Auto;
+			textField.style.width = width;
+
+			//The cancel button is improperly aligned so we have to fix that
+			Button cancelButton = toolbarSearchField.Q<Button>("unity-cancel");
+			cancelButton.style.width = 15;
+			//The search button doesn't expand automatically, so we have to fix that
+			Button searchButton = toolbarSearchField.Q<Button>("unity-search");
+			searchButton.style.flexGrow = 1;
+			//Set the Search Field to be 1/2 width
+			toolbar.RegisterCallback<GeometryChangedEvent>(evt => toolbarSearchField.style.marginLeft = evt.newRect.width / 2f - 70);
+
+			toolbar.Add(toolbarSearchField);
+
+			#endregion
+		}
+
 		#region Search
 
-		private readonly Dictionary<IDocumentationPage<T>, List<string>> searchStringsCache = new Dictionary<IDocumentationPage<T>,List<string>>();
+		private readonly Dictionary<IDocumentationPage<T>, List<string>> searchStringsCache = new Dictionary<IDocumentationPage<T>, List<string>>();
 		private const int maxMatchCount = 6;
-		
+
 		void DoSearch()
 		{
 			EditorPrefs.SetString(searchEditorPrefsKey, searchString);
-			
+
 			if (string.IsNullOrEmpty(searchString))
 			{
 				searchRoot.Clear();
@@ -333,10 +457,10 @@ namespace Vertx
 			}
 
 			string searchStringLower = searchString.ToLower();
-						
+
 			//Cache current page
 			string currentPageStateNameCached = currentPageStateName;
-			
+
 			//Clear the previous search
 			searchRoot.Clear();
 			searchRoot.visible = true;
@@ -352,10 +476,10 @@ namespace Vertx
 				{
 					searchStrings = new List<string>();
 					searchStringsCache.Add(page, searchStrings);
-					
+
 					//Load the page under searchRootTemp
 					LoadPage(page, searchRootTemp);
-					
+
 					//Get all the paragraph element's text (combined together)
 					searchRootTemp.Query(null, "paragraph-container").ForEach(paragraph =>
 					{
@@ -373,13 +497,13 @@ namespace Vertx
 					string searchStringLocalLower = searchStringLocal.ToLower();
 					if (searchStringLocalLower.Contains(searchStringLower))
 					{
-						if(!searchResults.TryGetValue(page, out var resultStrings))
+						if (!searchResults.TryGetValue(page, out var resultStrings))
 							searchResults.Add(page, resultStrings = new List<string>());
 						resultStrings.Add(searchStringLocal);
 					}
 				}
 			}
-			
+
 			List<string> matches = new List<string>(maxMatchCount);
 
 			foreach (var result in searchResults)
@@ -400,13 +524,13 @@ namespace Vertx
 				Label resultCountLabel = RichTextUtility.AddInlineText($" ({result.Value.Count} Results)", searchResultButton);
 				resultCountLabel.style.color = new Color(1, 1, 1, 0.35f);
 				searchResultButton.RegisterCallback<MouseUpEvent>(evt => searchRoot.visible = false);
-				
+
 				//Results (the string matches)
 				VisualElement resultMatchesContainer = new VisualElement();
 				resultMatchesContainer.ClearClassList();
 				resultMatchesContainer.AddToClassList("result-matches-container");
 				resultContainer.Add(resultMatchesContainer);
-								
+
 				//Create a hashset of all the matched words.
 				matches.Clear();
 				foreach (string m in result.Value)
@@ -418,6 +542,7 @@ namespace Vertx
 					if (matches.Count > maxMatchCount)
 						break;
 				}
+
 				//Add a max of maxMatchCount inline text to the resultMatchesContainer
 				int l = Mathf.Min(maxMatchCount, matches.Count);
 				for (int i = 0; i < l; i++)
@@ -440,7 +565,8 @@ namespace Vertx
 					{
 						matchContent = RichTextUtility.AddInlineText(matches[i].Substring(indexOf, searchStringLower.Length), inlineTextGroup);
 						RichTextUtility.AddInlineText(matches[i].Substring(searchStringLower.Length), inlineTextGroup);
-					}else if (indexOf == matches[i].Length - searchStringLower.Length)
+					}
+					else if (indexOf == matches[i].Length - searchStringLower.Length)
 					{
 						RichTextUtility.AddInlineText(matches[i].Substring(0, indexOf), inlineTextGroup);
 						matchContent = RichTextUtility.AddInlineText(matches[i].Substring(indexOf), inlineTextGroup);
@@ -451,15 +577,16 @@ namespace Vertx
 						matchContent = RichTextUtility.AddInlineText(matches[i].Substring(indexOf, searchStringLower.Length), inlineTextGroup);
 						RichTextUtility.AddInlineText(matches[i].Substring(indexOf + searchStringLower.Length), inlineTextGroup);
 					}
+
 					matchContent.style.color = new Color(1, 0.5f, 0);
 				}
 
 				if (l != matches.Count)
 					RichTextUtility.AddInlineText("...", resultMatchesContainer);
 			}
-			
-			searchRoot.Sort((a,b)=>searchResults[(IDocumentationPage<T>) b.userData].Count.CompareTo(searchResults[(IDocumentationPage<T>) a.userData].Count));
-			
+
+			searchRoot.Sort((a, b) => searchResults[(IDocumentationPage<T>) b.userData].Count.CompareTo(searchResults[(IDocumentationPage<T>) a.userData].Count));
+
 			//Reset page
 			currentPageStateName = currentPageStateNameCached;
 		}
@@ -474,8 +601,15 @@ namespace Vertx
 		{
 			history.Clear();
 			forwardHistory.Clear();
+			ModifiedHistory();
 		}
-		
+
+		void ModifiedHistory()
+		{
+			backButton?.SetEnabled(history.Count > 0);
+			forwardButton?.SetEnabled(forwardHistory.Count > 0);
+		}
+
 		private readonly Stack<string> history = new Stack<string>();
 		private string _currentPageStateName;
 
@@ -525,15 +659,16 @@ namespace Vertx
 		{
 			if (addToHistory)
 			{
-				if(currentPageStateName != pageName)
+				if (currentPageStateName != pageName)
 					history.Push(currentPageStateName);
 			}
 
 			LoadPage(pageName);
+			ModifiedHistory();
 		}
 
 		#endregion
-		
+
 		#region Helpers 
 
 		public override string GetTitleFromPage(Type pageType) => pages[pageType.FullName].Title;
@@ -544,7 +679,7 @@ namespace Vertx
 
 		#region Textures
 
-		private static readonly Dictionary<string, Texture> helpTextures = new Dictionary<string, Texture>();
+		private static readonly Dictionary<string, Texture2D> helpTextures = new Dictionary<string, Texture2D>();
 
 		/*
 		/// <summary>
@@ -575,9 +710,9 @@ namespace Vertx
 		}
 */
 
-		private static Texture GetTexture(string textureName)
+		private static Texture2D GetTexture(string textureName)
 		{
-			if (helpTextures.TryGetValue(textureName, out Texture t)) return t;
+			if (helpTextures.TryGetValue(textureName, out Texture2D t)) return t;
 			t = LoadAssetOfType<Texture2D>(textureName);
 			helpTextures.Add(textureName, t);
 			return t;
@@ -608,6 +743,7 @@ namespace Vertx
 				Debug.LogWarning($"Action provided with \"{key}\" cannot be null.");
 				return false;
 			}
+
 			_buttonRegistry.Add(key, action);
 			return true;
 		}
