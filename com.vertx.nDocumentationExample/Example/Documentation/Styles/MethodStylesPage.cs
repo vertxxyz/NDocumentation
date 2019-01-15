@@ -14,7 +14,7 @@ namespace Vertx.Example
 			window.AddHeader("Methods", 15);
 
 			//Full Width Buttons
-			window.AddFullWidthButton("Full Width Buttons", Color.magenta, RichTextStylesPage.buttonKey);
+			window.AddFullWidthButton("Full Width Buttons", Color.magenta, RichTextStylesPage.ButtonKey);
 			window.AddRichText($"<code>window.AddFullWidthButton(\"Label\", Color.magenta, buttonKey);</code>");
 
 			//Vertical Space

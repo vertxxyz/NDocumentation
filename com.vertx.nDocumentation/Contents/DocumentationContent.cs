@@ -358,13 +358,17 @@ namespace Vertx
 			root.Add(toolbar);
 			// Back Button
 			backButton = AddToolbarButton(EditorGUIUtility.isProSkin ? GetTexture("Back") : GetTexture("Back_Alt"), Back, 5);
+			backButton.tooltip = "Back";
 			backButton.SetEnabled(false);
 			toolbar.Add(backButton);
 			// Forward Button
 			forwardButton = AddToolbarButton(EditorGUIUtility.isProSkin ? GetTexture("Forward") : GetTexture("Forward_Alt"), Forward, 0);
+			forwardButton.tooltip = "Forward";
 			forwardButton.SetEnabled(false);
 			toolbar.Add(forwardButton);
-			toolbar.Add(AddToolbarButton(EditorGUIUtility.isProSkin ? GetTexture("Home") : GetTexture("Home_Alt"), Home, 2));
+			VisualElement homeButton = AddToolbarButton(EditorGUIUtility.isProSkin ? GetTexture("Home") : GetTexture("Home_Alt"), Home, 2);
+			homeButton.tooltip = "Home";
+			toolbar.Add(homeButton);
 
 			ToolbarButton AddToolbarButton(Texture texture, Action action, float marginLeft)
 			{

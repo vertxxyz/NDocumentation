@@ -30,10 +30,10 @@ namespace Vertx.Example
 			window.AddRichText($"You can style text with {RichTextUtility.GetColouredString("colour", Color.cyan)}:\n<code>\"<color=#00FFFF>color</color>\"</code>");
 			
 			//Inline Buttons
-			window.AddRichText($"You can add inline {RichTextUtility.GetButtonString(buttonKey, RichTextUtility.GetColouredString("buttons", Color.green))}\n<code>\"<button=key><color=#00FF00>label</color></button>\"</code>");
+			window.AddRichText($"You can add inline {RichTextUtility.GetButtonString(ButtonKey, RichTextUtility.GetColouredString("buttons", Color.green))}\n<code>\"<button=key><color=#00FF00>label</color></button>\"</code>");
 		}
 		
-		public const string buttonKey = "button_key_example";
-		public override void Initialise(ExampleWindow window) => window.RegisterButton(buttonKey, ()=> Debug.Log("You can register these buttons in Initialise!"));
+		public const string ButtonKey = "button_key_example";
+		public override void Initialise(ExampleWindow window) => window.RegisterButton(ButtonKey, ()=> window.GoToPage(typeof(ButtonRegistryPage)));
 	}
 }
