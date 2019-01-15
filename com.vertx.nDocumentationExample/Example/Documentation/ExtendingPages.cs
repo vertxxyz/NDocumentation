@@ -10,12 +10,12 @@ namespace Vertx.Example
 		public override Color Color => ExtendColor;
 		public override string Title => "Extending Pages";
 
-		public override void DrawDocumentation(ExampleWindow window, VisualElement root)
+		public override void DrawDocumentation(ExampleWindow window)
 		{
 			window.AddHeader(Title, 18, FontStyle.Normal);
 		}
 		
-		public override void DrawDocumentationAfterAdditions(ExampleWindow window, VisualElement root) => LandingPage.AddNextButton(window, typeof(StylingPage));
+		public override void DrawDocumentationAfterAdditions(ExampleWindow window) => LandingPage.AddNextButton(window, typeof(StylingPage));
 
 		public static readonly Color ExtendColor = new Color(1f, 0.87f, 0.32f);
 		public static readonly Color InjectColor = new Color(0.77f, 0.48f, 1f);

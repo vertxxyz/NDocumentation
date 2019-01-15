@@ -13,7 +13,7 @@ namespace Vertx.Example
 		public override Color Color => CreateColor;
 		public override string Title => "Creating Pages";
 
-		public override void DrawDocumentation(ExampleWindow window, VisualElement root)
+		public override void DrawDocumentation(ExampleWindow window)
 		{
 			window.AddHeader(Title, 18, FontStyle.Normal);
 			window.AddRichText($"Both Root and Sub-pages can be created with a {DocumentationPageString}.");
@@ -22,7 +22,7 @@ namespace Vertx.Example
     public override ButtonInjection[] InjectedButtonLinks => new []{new ButtonInjection(typeof(FooPage), 0)};
     public override Color Color => new Color(1,1,1);
     public override string Title => ""Bar Page"";
-    public override void DrawDocumentation(FooWindow window, VisualElement root)
+    public override void DrawDocumentation(FooWindow window)
     {
         ...
     }
@@ -32,7 +32,7 @@ namespace Vertx.Example
 			window.AddRichText($"You can optionally extend a {DocumentationPageString} with additional content by using a {DocumentationPageAdditionString}. (see {ExtendingPagesButton})");
 		}
 
-		public override void DrawDocumentationAfterAdditions(ExampleWindow window, VisualElement root) => LandingPage.AddNextButton(window, typeof(ExtendingPages));
+		public override void DrawDocumentationAfterAdditions(ExampleWindow window) => LandingPage.AddNextButton(window, typeof(ExtendingPages));
 
 		public static readonly string DocumentationPageSimpleString = GetColouredString("DocumentationPage", CreateColor);
 		public static readonly string DocumentationPageString = GetColouredString(nameof(DocumentationPage<DocumentationWindow>), CreateColor);

@@ -10,7 +10,7 @@ namespace Vertx.Example
 		public override Color Color => CreateColor;
 		public override string Title => "Creating a Window";
 
-		public override void DrawDocumentation(ExampleWindow window, VisualElement root)
+		public override void DrawDocumentation(ExampleWindow window)
 		{
 			window.AddHeader(Title, 18, FontStyle.Normal);
 			window.AddRichText($"A {DocumentationWindowString} is the base Editor Window that displays documentation content.");
@@ -28,7 +28,7 @@ namespace Vertx.Example
 }</code>");
 		}
 
-		public override void DrawDocumentationAfterAdditions(ExampleWindow window, VisualElement root) => LandingPage.AddNextButton(window, typeof(CreatingPage));
+		public override void DrawDocumentationAfterAdditions(ExampleWindow window) => LandingPage.AddNextButton(window, typeof(CreatingPage));
 
 		public static readonly Color CreateColor = new Color(1f, 0.11f, 0.33f);
 		public static readonly string DocumentationWindowString = GetColouredString(nameof(DocumentationWindow), CreateColor);

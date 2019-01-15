@@ -51,8 +51,8 @@ namespace Vertx
 		public abstract Color Color { get; }
 		public abstract string Title { get; }
 
-		public abstract void DrawDocumentation(T window, VisualElement root);
-		public virtual void DrawDocumentationAfterAdditions(T window, VisualElement root) { }
+		public abstract void DrawDocumentation(T window);
+		public virtual void DrawDocumentationAfterAdditions(T window) { }
 		public virtual void Initialise(T window) { }
 	}
 }

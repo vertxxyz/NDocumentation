@@ -10,7 +10,7 @@ namespace Vertx
 		public override Color Color => StylingColor;
 		public override string Title => "Styling Pages";
 
-		public override void DrawDocumentation(ExampleWindow window, VisualElement root)
+		public override void DrawDocumentation(ExampleWindow window)
 		{
 			window.AddHeader(Title, 18, FontStyle.Normal);
 			window.AddRichText("Styling pages can be achieved with: <b>buttons</b>, <b>colours</b>, <b>sizes</b>, <b>images</b>, <b>code</b>, and <b>styles</b>.");

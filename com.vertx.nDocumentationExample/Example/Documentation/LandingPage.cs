@@ -10,7 +10,7 @@ namespace Vertx.Example
 		public override Color Color => Color.grey;
 		public override string Title => "Home";
 
-		public override void DrawDocumentation(ExampleWindow window, VisualElement root)
+		public override void DrawDocumentation(ExampleWindow window)
 		{
 			window.AddHeader("<b>nDocumentation</b>");
 			window.AddVerticalSpace(5);

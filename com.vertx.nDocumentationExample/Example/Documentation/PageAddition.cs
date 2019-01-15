@@ -11,7 +11,7 @@ namespace Vertx.Example
 		public override Type PageToAddToType => typeof(ExtendingPages);
 		public override float Order => 0;
 
-		public override void DrawDocumentation(ExampleWindow window, VisualElement root)
+		public override void DrawDocumentation(ExampleWindow window)
 		{
 			window.AddRichText($"<b><i>This content</i></b> has been injected into the page using a {DocumentationPageAdditionString}.");
 
@@ -20,7 +20,7 @@ namespace Vertx.Example
 	public override Type PageToAddToType => typeof(BarPage);
 	public override float Order => 0;
 
-	public override void DrawDocumentation(FooWindow window, VisualElement root)
+	public override void DrawDocumentation(FooWindow window)
 	{
 		...
 	}

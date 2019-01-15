@@ -10,7 +10,7 @@ namespace Vertx.Example
 		public override Type PageToAddToType => typeof(StylingPage);
 		public override float Order => 0;
 
-		public override void DrawDocumentation(ExampleWindow window, VisualElement root)
+		public override void DrawDocumentation(ExampleWindow window)
 		{
 			window.AddVerticalSpace(15);
 			window.AddHeader("Rich Text", 15);

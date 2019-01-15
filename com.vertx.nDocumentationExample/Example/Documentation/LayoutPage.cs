@@ -12,7 +12,7 @@ namespace Vertx.Example
 		public override Color Color => LayoutColor;
 		public override string Title => "Page Layout";
 
-		public override void DrawDocumentation(ExampleWindow window, VisualElement root)
+		public override void DrawDocumentation(ExampleWindow window)
 		{
 			window.AddHeader(Title, 18, FontStyle.Normal);
 			window.AddRichText($"All Pages are laid out in the same fashion.\nThere is a <i>Content</i> section followed by <i>Button Injection</i>s. The content section first contains original content provided by the {CreatingPage.DocumentationPageSimpleString}, then content added by {PageAddition.DocumentationPageAdditionsSpacedString}.");
@@ -20,7 +20,7 @@ namespace Vertx.Example
 			// Window
 			VisualElement windowContainer = new Button(()=>window.GoToPage(typeof(WindowPage)));
 			ModifyStyle(windowContainer, CreateColor, 2);
-			root.Add(windowContainer);
+			window.GetDefaultRoot().Add(windowContainer);
 			using (new DefaultRootScope(window, windowContainer))
 			{
 				window.AddRichText(DocumentationWindowString);
@@ -59,7 +59,7 @@ namespace Vertx.Example
 			}
 		}
 
-		public override void DrawDocumentationAfterAdditions(ExampleWindow window, VisualElement root) => LandingPage.AddNextButton(window, typeof(WindowPage));
+		public override void DrawDocumentationAfterAdditions(ExampleWindow window) => LandingPage.AddNextButton(window, typeof(WindowPage));
 
 		private static void ModifyStyle(VisualElement element, Color borderColor, float borderRadius = 0)
 		{

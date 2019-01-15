@@ -247,16 +247,16 @@ namespace Vertx
 
 			//Documentation
 			SetCurrentDefaultRoot(root);
-			page.DrawDocumentation(window, root);
+			page.DrawDocumentation(window);
 
 			//Additions
 			if (additions.TryGetValue(page, out var additionsList))
 			{
 				foreach (var addition in additionsList)
-					addition.DrawDocumentation(window, root);
+					addition.DrawDocumentation(window);
 			}
 			
-			page.DrawDocumentationAfterAdditions(window, root);
+			page.DrawDocumentationAfterAdditions(window);
 
 			//Button Links
 			if (injectedButtonLinks.TryGetValue(page, out var buttonsBelow))
