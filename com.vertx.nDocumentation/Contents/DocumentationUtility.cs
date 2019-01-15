@@ -7,7 +7,7 @@ using Object = UnityEngine.Object;
 
 namespace Vertx
 {
-	internal static class DocumentationUtility
+	public static class DocumentationUtility
 	{
 		#region Search
 

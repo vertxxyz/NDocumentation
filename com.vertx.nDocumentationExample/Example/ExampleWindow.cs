@@ -1,5 +1,6 @@
 ﻿using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Vertx.Example
 {
@@ -15,6 +16,11 @@ namespace Vertx.Example
 
 		protected override string StateEditorPrefsKey => "Example_Prefs_Key";
 
-		private void OnEnable() => InitialiseDocumentationOnRoot(this, rootVisualElement);
+		private void OnEnable()
+		{
+			InitialiseDocumentationOnRoot(this, rootVisualElement);
+			StyleSheet exampleStyleSheet = DocumentationUtility.LoadAssetOfType<StyleSheet>("ExampleStyles", DocumentationUtility.SearchFilter.Packages);
+			GetDefaultRoot().styleSheets.Add(exampleStyleSheet);
+		}
 	}
 }

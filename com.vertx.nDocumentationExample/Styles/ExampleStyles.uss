@@ -1,0 +1,4 @@
+.text-example {
+	background-image: resource("toolbar back");
+	color: #7fff00;
+}
