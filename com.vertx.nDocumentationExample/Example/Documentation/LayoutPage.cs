@@ -57,29 +57,29 @@ namespace Vertx.Example
 						window.AddRichText(GetColouredString("Injected Button Links", ExtendingPages.InjectColor));
 				}
 			}
+			
+			void ModifyStyle(VisualElement element, Color borderColor, float borderRadius = 0)
+			{
+				element.ClearClassList();
+				IStyle s = element.style;
+				s.marginTop = 5;
+				s.marginBottom = 5;
+				s.marginLeft = 16;
+				s.marginRight = 5;
+				s.borderColor = borderColor;
+				s.borderTopWidth = 1;
+				s.borderLeftWidth = 1;
+				s.borderRightWidth = 1;
+				s.borderBottomWidth = 1;
+				s.alignSelf = Align.Stretch;
+				s.borderTopLeftRadius = borderRadius;
+				s.borderTopRightRadius = borderRadius;
+				s.borderBottomLeftRadius = borderRadius;
+				s.borderBottomRightRadius = borderRadius;
+			}
 		}
 
 		public override void DrawDocumentationAfterAdditions(ExampleWindow window) => LandingPage.AddNextButton(window, typeof(WindowPage));
-
-		private static void ModifyStyle(VisualElement element, Color borderColor, float borderRadius = 0)
-		{
-			element.ClearClassList();
-			IStyle s = element.style;
-			s.marginTop = 5;
-			s.marginBottom = 5;
-			s.marginLeft = 16;
-			s.marginRight = 5;
-			s.borderColor = borderColor;
-			s.borderTopWidth = 1;
-			s.borderLeftWidth = 1;
-			s.borderRightWidth = 1;
-			s.borderBottomWidth = 1;
-			s.alignSelf = Align.Stretch;
-			s.borderTopLeftRadius = borderRadius;
-			s.borderTopRightRadius = borderRadius;
-			s.borderBottomLeftRadius = borderRadius;
-			s.borderBottomRightRadius = borderRadius;
-		}
 
 		public static readonly Color LayoutColor = new Color(0f, 0.7f, 1f);
 	}

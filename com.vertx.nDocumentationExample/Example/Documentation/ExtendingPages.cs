@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.UIElements;
 using static Vertx.RichTextUtility;
 
 namespace Vertx.Example

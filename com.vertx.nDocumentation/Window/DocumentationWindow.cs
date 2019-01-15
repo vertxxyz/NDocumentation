@@ -30,8 +30,7 @@ namespace Vertx
 		/// <summary>
 		/// Constant Header is an always-drawn header section for all pages.
 		/// </summary>
-		/// <param name="root">Root Element to append to.</param>
-		public virtual void DrawConstantHeader(VisualElement root) { }
+		public virtual void DrawConstantHeader() { }
 
 		#region Initialise Content
 
@@ -182,7 +181,16 @@ namespace Vertx
 
 		#region Helpers
 
+		/// <summary>
+		/// Sets the root used by Documentation content. DefaultRootScope is the safe way to set and reset content.
+		/// </summary>
+		/// <param name="root">Visual Element to append Documentation content to by default.</param>
 		public void SetDefaultRoot(VisualElement root) => content.SetCurrentDefaultRoot(root);
+		
+		/// <summary>
+		/// You can set the DefaultRoot using a DefaultRootScope or by calling SetDefaultRoot manually.
+		/// </summary>
+		/// <returns>The root VisualElement currently used by the Documentation content</returns>
 		public VisualElement GetDefaultRoot() => content.GetRoot();
 
 		public struct DefaultRootScope : IDisposable

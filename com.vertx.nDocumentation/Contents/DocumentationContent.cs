@@ -243,10 +243,9 @@ namespace Vertx
 			root.Clear();
 
 			//Constant header
-			window.DrawConstantHeader(root);
+			window.DrawConstantHeader();
 
 			//Documentation
-			SetCurrentDefaultRoot(root);
 			page.DrawDocumentation(window);
 
 			//Additions
