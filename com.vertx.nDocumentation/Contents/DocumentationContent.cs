@@ -58,6 +58,7 @@ namespace Vertx
 
 		private ToolbarButton backButton;
 		private ToolbarButton forwardButton;
+		private ToolbarButton homeButton;
 
 		public DocumentationContent(VisualElement root, T window, string stateEditorPrefsKey = null)
 		{
@@ -366,7 +367,7 @@ namespace Vertx
 			forwardButton.tooltip = "Forward";
 			forwardButton.SetEnabled(false);
 			toolbar.Add(forwardButton);
-			VisualElement homeButton = AddToolbarButton(EditorGUIUtility.isProSkin ? GetTexture("Home") : GetTexture("Home_Alt"), Home, 2);
+			homeButton = AddToolbarButton(EditorGUIUtility.isProSkin ? GetTexture("Home") : GetTexture("Home_Alt"), Home, 2);
 			homeButton.tooltip = "Home";
 			toolbar.Add(homeButton);
 
@@ -612,6 +613,7 @@ namespace Vertx
 		{
 			backButton?.SetEnabled(history.Count > 0);
 			forwardButton?.SetEnabled(forwardHistory.Count > 0);
+			homeButton?.SetEnabled(currentPageStateName != null && !currentPageStateName.Equals(pageRoot.GetType().FullName));
 		}
 
 		private readonly Stack<string> history = new Stack<string>();

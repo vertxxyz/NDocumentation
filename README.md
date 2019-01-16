@@ -7,7 +7,7 @@ An extensible, searchable documentation window for the Unity Editor that display
 
 **2019.1.0a12 is not supported due to an issue with nested scroll views.**
 
-**Currently recommended version: 2019.1.0a13**
+**Currently recommended versions: 2019.1.0a13 or a14**
 
 ----
 ## Intended Use Case

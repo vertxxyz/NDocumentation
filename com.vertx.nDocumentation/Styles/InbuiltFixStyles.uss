@@ -1,7 +1,7 @@
 /* --------------------- BUTTONS --------------------- */
 
 .unity-button#unity-search:hover {
-	background-image: resource("toolbarsearch");
+	/*background-image: resource("toolbarsearch");*/
 }
 
 .unity-button#unity-search:active {
@@ -9,7 +9,7 @@
 }
 
 .unity-button#unity-cancel:hover {
-	background-image: resource("toolbarsearchCancelButton");
+	/*background-image: resource("toolbarsearchCancelButton");*/
 }
 
 .unity-button#unity-cancel:active {
