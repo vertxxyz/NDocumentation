@@ -157,7 +157,7 @@ Button {
 
 .vertical-space {
 	align-self: stretch;
-	background-color: transparent;
+	background-color: rgba(0,0,0,0);
 }
 
 /* --------------------- CODE --------------------- */
@@ -176,7 +176,7 @@ Button {
 
 .code-button {
 	background-image: none;
-	background-color: transparent;
+	background-color: rgba(0,0,0,0);
 	padding: 0;
 	margin: 0;
 	position: absolute;
