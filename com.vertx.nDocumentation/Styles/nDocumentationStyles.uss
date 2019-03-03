@@ -5,7 +5,7 @@
 }
 
 .scroll-view-content {
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
 	align-items: flex-start;
 	flex-direction: column;
 	background-color: #383838;
